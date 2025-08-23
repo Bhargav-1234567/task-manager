@@ -291,11 +291,11 @@ const KanbanBoard: React.FC = () => {
                 </h4>
                 <div className="flex items-center justify-between">
                   <div className="flex -space-x-2">
-                    {activeTask.assignees.slice(0, 3).map((assignee, index) => (
+                    { activeTask?.assignees?.slice(0, 3).map((assignee, index) => (
                       <div
                         key={assignee.id}
                         className={`w-6 h-6 rounded-full ${assignee.avatar} flex items-center justify-center text-xs font-medium text-white border-2 border-white`}
-                        style={{ zIndex: activeTask.assignees.length - index }}
+                        style={{ zIndex: (activeTask?.assignees?.length||0) - index }}
                       >
                         {assignee.name.charAt(0)}
                       </div>
