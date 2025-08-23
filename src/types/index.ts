@@ -6,15 +6,17 @@ export interface Assignee {
   id: string;
   name: string;
   avatar: string;
+  email?:string
 }
 
 export interface ITask {
   id: string;
   title: string;
+  dateRange?:string,
   description?: string;
-  dateRange?: string;
+  dueDate?: Date;
   priority: 'High' | 'Normal' | 'Low';
-  assignees: Assignee[];
+  assignees?: Assignee[];
   likes: number;
   comments: number;
   status?: string; // This will match the container title

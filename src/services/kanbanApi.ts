@@ -144,15 +144,13 @@ export const kanbanApi = {
   updateTask: async (taskId: string, updates: Partial<ITask>): Promise<boolean> => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
-    console.log(`Updating task ${taskId} with:`, updates);
-    return true;
+     return true;
   },
 
   updateContainer: async (containerId: string, title: string): Promise<boolean> => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 500));
-    console.log(`Updating container ${containerId} title to: ${title}`);
-    return true;
+     return true;
   },
 
   // Add more API methods as needed

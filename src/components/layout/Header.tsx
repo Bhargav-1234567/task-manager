@@ -1,6 +1,7 @@
 'use client'
 import ThemeToggle from '@/components/ThemeToggle'
 import { Bell, Filter, Plus, Search, Settings } from 'lucide-react'
+import LogoutButton from '../auth/LogoutButton'
 
 export default function Header() {
   return (
@@ -12,7 +13,7 @@ export default function Header() {
                    All Tasks
                  </h1>
                   </div>
-                 
+                 <LogoutButton/>
                  <div className="flex items-center gap-4">
                    <div className="relative">
                      <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
