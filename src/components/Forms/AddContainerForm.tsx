@@ -19,13 +19,13 @@ export default function AddContainerForm() {
   } = useForm<FormValues>();
 const dispatch = useDispatch<AppDispatch>();
   const onSubmit = (data: FormValues) => {
-     dispatch(
-      addContainer({
-        id: window.crypto.randomUUID(),
-        title: data.title,
-        taskIds: [], // must include this
-      })
-    );
+    //  dispatch(
+    //   addContainer({
+    //     id: window.crypto.randomUUID(),
+    //     title: data.title,
+    //     taskIds: [], // must include this
+    //   })
+    // );
   };
 
   return (
