@@ -15,10 +15,31 @@ const baseQuery = fetchBaseQuery({
   credentials: 'include',
 });
 
-// Wrapper for handling 401
+const getCookie = (name: string) => {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+};
+
+// Wrapper for handling 401 and adding token from cookie
 const baseQueryWithAuth = async (args: any, api: any, extraOptions: any) => {
+  // Get token from cookie (replace 'token' with your cookie name)
+  const token = getCookie('token');
+
+  // If args is a string, convert to object
+  if (typeof args === 'string') {
+    args = { url: args };
+  }
+ 
+  // Add Authorization header
+  args.headers = {
+    ...args.headers,
+    Authorization: token ? `Bearer ${token}` : undefined,
+  };
+
   const result = await baseQuery(args, api, extraOptions);
-console.log({result})
+ 
+  // Handle 401
   if (result.error && result.error.status === 401) {
     if (typeof window !== 'undefined') {
       window.location.href = '/login';
@@ -27,7 +48,6 @@ console.log({result})
 
   return result;
 };
-
 export const taskApi = createApi({
   reducerPath: 'taskApi',
   baseQuery: baseQueryWithAuth,
