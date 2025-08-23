@@ -33,7 +33,8 @@ export async function POST(req: Request) {
           id: userData._id,
           name: userData.name,
           email: userData.email,
-          avatar: userData.avatar
+          avatar: userData.avatar,
+          token:userData.token
         } 
       },
       { status: 200 }

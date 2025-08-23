@@ -3,9 +3,9 @@ import { serialize, parse } from 'cookie'
 
 export const setAuthCookie = (token: string, maxAge: number = 60 * 60) => {
   return serialize('token', token, {
-    httpOnly: false,
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: false,
+    sameSite: 'strict',
     path: '/',
     maxAge,
   })
@@ -13,9 +13,9 @@ export const setAuthCookie = (token: string, maxAge: number = 60 * 60) => {
 
 export const clearAuthCookie = () => {
   return serialize('token', '', {
-    httpOnly: false,
+    httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: false,
+    sameSite: 'strict',
     path: '/',
     maxAge: 0,
   })

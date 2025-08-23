@@ -10,6 +10,7 @@ interface LoginResponse {
     name: string
     email: string
     avatar: string
+    token:string
   }
 }
 
