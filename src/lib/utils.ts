@@ -11,14 +11,14 @@ export interface ContainerWithTasks {
   title: string;
   tasks: ITask[]; // full tasks array here
 }
-export function normalizeKanban(data: ContainerWithTasks[]) {
-  const tasks: ITask[] = [];
-  const containers: Container[] = data.map((container) => {
-    const taskIds = container.tasks.map((task) => {
-      tasks.push(task);
-      return task.id;
-    });
-    return { id: container.id, title: container.title, taskIds };
-  });
-  return { tasks, containers };
-}
+// export function normalizeKanban(data: ContainerWithTasks[]) {
+//   const tasks: ITask[] = [];
+//   const containers: Container[] = data.map((container) => {
+//     const taskIds = container.tasks.map((task) => {
+//       tasks.push(task);
+//       return task.id;
+//     });
+//     return { id: container.id, title: container.title, taskIds };
+//   });
+//   return { tasks, containers };
+// }
