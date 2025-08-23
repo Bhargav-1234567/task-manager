@@ -3,6 +3,7 @@ const nextConfig = {
   // Remove standalone output for Netlify
   // output: "standalone",
   trailingSlash: true,
+  output: "standalone",
   // Add these for better compatibility
   images: {
     unoptimized: true,
