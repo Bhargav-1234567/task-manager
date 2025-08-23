@@ -8,7 +8,7 @@
     .find(row => row.startsWith('token='))
     ?.split('=')[1]
 
-  const headers = {
+  const headers:any = {
     'Content-Type': 'application/json',
     ...options.headers,
   }

@@ -166,19 +166,19 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
       {/* Assignees */}
       <div className="flex items-center justify-between">
         <div className="flex -space-x-2">
-          {task.assignees.slice(0, 3).map((assignee, index) => (
+          {task?.assignees?.slice(0, 3).map((assignee, index) => (
             <div
               key={assignee.id}
               className={`w-6 h-6 rounded-full ${assignee.avatar} flex items-center justify-center text-xs font-medium text-white border-2 border-white dark:border-gray-800`}
-              style={{ zIndex: task.assignees.length - index }}
+              style={{ zIndex:( task?.assignees?.length||0) - index }}
               title={assignee.name}
             >
               {assignee.name.charAt(0)}
             </div>
           ))}
-          {task.assignees.length > 3 && (
+          {task?.assignees?.length&& task?.assignees?.length > 3 && (
             <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 border-2 border-white dark:border-gray-800">
-              +{task.assignees.length - 3}
+              +{task?.assignees?.length - 3}
             </div>
           )}
         </div>
