@@ -16,6 +16,7 @@ export async function POST(req: Request) {
     })
     if (response.status!==200) {
       const error = await response.json()
+      console.error("Login error:", error);
       return NextResponse.json(
         { message: error.message || 'Authentication failed' },
         { status: response.status }
