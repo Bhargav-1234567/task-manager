@@ -1,192 +1,131 @@
-// store/kanbanSlice.ts
-import { createSlice, createEntityAdapter, PayloadAction, createSelector } from '@reduxjs/toolkit';
-import { RootState } from './store';
-import { ITask } from '@/types';
+// store/slices/kanbanSlice.ts
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Container, ITask as Task, Assignee } from '@/types';
 
-// ---- Types ----
- 
-
-export interface Container {
-  id: string;
-  title: string;
-  taskIds: string[]; // scalable (references only)
-  // future fields: order, color, owner, etc.
+interface KanbanState {
+  containers: Container[];
+  isLoading: boolean;
+  error: string | null;
 }
 
-// ---- Entity Adapters ----
-const tasksAdapter = createEntityAdapter<ITask>();
-const containersAdapter = createEntityAdapter<Container>();
-
-// ---- Initial State ----
-const initialState = {
-  tasks: tasksAdapter.getInitialState(),
-  containers: containersAdapter.getInitialState(),
+const initialState: KanbanState = {
+  containers: [],
+  isLoading: false,
+  error: null,
 };
 
-// ---- Slice ----
 const kanbanSlice = createSlice({
   name: 'kanban',
   initialState,
   reducers: {
-    // Save initial data (bulk load)
-    setInitialData: (
-      state,
-      action: PayloadAction<{ tasks: ITask[]; containers: Container[] }>
-    ) => {
-      tasksAdapter.setAll(state.tasks, action.payload.tasks);
-      containersAdapter.setAll(state.containers, action.payload.containers);
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
     },
-
-    // Add new container
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
+    },
+    setInitialData: (state, action: PayloadAction<Container[]>) => {
+      state.containers = action.payload;
+      state.isLoading = false;
+      state.error = null;
+    },
+    
+    // Container CRUD operations
     addContainer: (state, action: PayloadAction<Container>) => {
-      containersAdapter.addOne(state.containers, action.payload);
+      state.containers.push(action.payload);
     },
-
-    // Add new task (and assign to container)
-    addTask: (
-      state,
-      action: PayloadAction<{ task: ITask; containerId: string }>
-    ) => {
-      const { task, containerId } = action.payload;
-      tasksAdapter.addOne(state.tasks, task);
-
-      const container = state.containers.entities[containerId];
+    updateContainer: (state, action: PayloadAction<{ id: string; title: string }>) => {
+      const container = state.containers.find(c => c.id === action.payload.id);
       if (container) {
-        container.taskIds.push(task.id);
+        container.title = action.payload.title;
+        // Update status of all tasks in this container
+        container.tasks.forEach(task => {
+          task.status = action.payload.title;
+        });
       }
     },
-
-    // Update task by taskId
-    updateTask: (
-      state,
-      action: PayloadAction<{ id: string; changes: Partial<ITask> }>
-    ) => {
-      tasksAdapter.updateOne(state.tasks, action.payload);
+    deleteContainer: (state, action: PayloadAction<string>) => {
+      state.containers = state.containers.filter(c => c.id !== action.payload);
     },
-
-    // Update container by containerId
-    updateContainer: (
-      state,
-      action: PayloadAction<{ id: string; changes: Partial<Container> }>
-    ) => {
-      containersAdapter.updateOne(state.containers, action.payload);
-    },
-
-    // Remove task
-    removeTask: (
-      state,
-      action: PayloadAction<{ taskId: string; containerId: string }>
-    ) => {
-      const { taskId, containerId } = action.payload;
-      tasksAdapter.removeOne(state.tasks, taskId);
-
-      const container = state.containers.entities[containerId];
+    
+    // Task CRUD operations
+    addTask: (state, action: PayloadAction<{ containerId: string; task: Task }>) => {
+      const container = state.containers.find(c => c.id === action.payload.containerId);
       if (container) {
-        container.taskIds = container.taskIds.filter((id) => id !== taskId);
+        container.tasks.push(action.payload.task);
       }
     },
-
-    // Remove container (and its tasks if needed)
-    removeContainer: (state, action: PayloadAction<string>) => {
-      const containerId = action.payload;
-      const container = state.containers.entities[containerId];
+    updateTask: (state, action: PayloadAction<{ 
+      containerId: string; 
+      taskId: string; 
+      updates: Partial<Task> 
+    }>) => {
+      const container = state.containers.find(c => c.id === action.payload.containerId);
       if (container) {
-        tasksAdapter.removeMany(state.tasks, container.taskIds);
+        const task = container.tasks.find(t => t.id === action.payload.taskId);
+        if (task) {
+          Object.assign(task, action.payload.updates);
+        }
       }
-      containersAdapter.removeOne(state.containers, containerId);
     },
-
-    // ---- NEW: Reorder tasks within the same container ----
-    reorderTask: (
-      state,
-      action: PayloadAction<{ containerId: string; fromIndex: number; toIndex: number }>
-    ) => {
-      const { containerId, fromIndex, toIndex } = action.payload;
-      const container = state.containers.entities[containerId];
-      if (!container) return;
-
-      const [moved] = container.taskIds.splice(fromIndex, 1);
-      container.taskIds.splice(toIndex, 0, moved);
+    deleteTask: (state, action: PayloadAction<{ containerId: string; taskId: string }>) => {
+      const container = state.containers.find(c => c.id === action.payload.containerId);
+      if (container) {
+        container.tasks = container.tasks.filter(t => t.id !== action.payload.taskId);
+      }
     },
-
-    // ---- NEW: Move task from one container to another ----
-    moveTask: (
-      state,
-      action: PayloadAction<{
-        taskId: string;
-        fromContainerId: string;
-        toContainerId: string;
-        toIndex?: number; // optional drop index (default: end of target)
-      }>
-    ) => {
-      const { taskId, fromContainerId, toContainerId, toIndex } = action.payload;
-
-      const fromContainer = state.containers.entities[fromContainerId];
-      const toContainer = state.containers.entities[toContainerId];
-
-      if (!fromContainer || !toContainer) return;
-
-      // remove from old container
-      fromContainer.taskIds = fromContainer.taskIds.filter((id) => id !== taskId);
-
-      // insert into new container
-      if (toIndex !== undefined) {
-        toContainer.taskIds.splice(toIndex, 0, taskId);
-      } else {
-        toContainer.taskIds.push(taskId);
+    
+    // Drag and drop operations
+    moveTaskWithinContainer: (state, action: PayloadAction<{
+      containerId: string;
+      fromIndex: number;
+      toIndex: number;
+    }>) => {
+      const container = state.containers.find(c => c.id === action.payload.containerId);
+      if (container) {
+        const [movedTask] = container.tasks.splice(action.payload.fromIndex, 1);
+        container.tasks.splice(action.payload.toIndex, 0, movedTask);
+      }
+    },
+    moveTaskBetweenContainers: (state, action: PayloadAction<{
+      fromContainerId: string;
+      toContainerId: string;
+      taskId: string;
+      toIndex?: number;
+    }>) => {
+      const fromContainer = state.containers.find(c => c.id === action.payload.fromContainerId);
+      const toContainer = state.containers.find(c => c.id === action.payload.toContainerId);
+      
+      if (fromContainer && toContainer) {
+        const taskIndex = fromContainer.tasks.findIndex(t => t.id === action.payload.taskId);
+        if (taskIndex !== -1) {
+          const [task] = fromContainer.tasks.splice(taskIndex, 1);
+          // Update task status to match new container
+          task.status = toContainer.title;
+          
+          if (action.payload.toIndex !== undefined) {
+            toContainer.tasks.splice(action.payload.toIndex, 0, task);
+          } else {
+            toContainer.tasks.push(task);
+          }
+        }
       }
     },
   },
 });
 
-// ---- Exports ----
 export const {
+  setLoading,
+  setError,
   setInitialData,
   addContainer,
+  updateContainer,
+  deleteContainer,
   addTask,
   updateTask,
-  updateContainer,
-  removeTask,
-  removeContainer,
-  reorderTask,
-  moveTask,
+  deleteTask,
+  moveTaskWithinContainer,
+  moveTaskBetweenContainers,
 } = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;
-
-// ---- Selectors ----
-export const taskSelectors = tasksAdapter.getSelectors<RootState>(
-  (state) => state.kanban.tasks
-);
-
-export const containerSelectors = containersAdapter.getSelectors<RootState>(
-  (state) => state.kanban.containers
-);
-
-
-
-// ---- Denormalized Selectors ----
-
-// Get all containers with their tasks (UI friendly)
-export const selectContainersWithTasks = createSelector(
-  [containerSelectors.selectAll, taskSelectors.selectEntities],
-  (containers, taskEntities) =>
-    containers.map((container) => ({
-      ...container,
-      tasks: container.taskIds
-        .map((id) => taskEntities[id])
-        .filter((task): task is ITask => Boolean(task)),
-    }))
-);
-// Get a single container with tasks by ID
-export const selectContainerWithTasksById = (id: string) =>
-  createSelector(
-    [(state: RootState) => state.kanban.containers.entities[id], taskSelectors.selectEntities],
-    (container, taskEntities) =>
-      container
-        ? {
-            ...container,
-            tasks: container.taskIds.map((tid) => taskEntities[tid]!).filter(Boolean),
-          }
-        : undefined
-  );

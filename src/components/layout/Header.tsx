@@ -8,15 +8,10 @@ export default function Header() {
              <div className="max-w-7xl mx-auto px-6 py-4">
                <div className="flex items-center justify-between">
                  <div className="flex items-center gap-6">
-                   <div className="flex items-center gap-3">
-                     <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded flex items-center justify-center">
-                       <span className="text-white dark:text-gray-900 font-bold text-sm">T</span>
-                     </div>
-                     <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                       Task<span className="font-normal">rapy</span>
-                     </span>
-                   </div>
-                 </div>
+                  <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                   All Tasks
+                 </h1>
+                  </div>
                  
                  <div className="flex items-center gap-4">
                    <div className="relative">
@@ -44,11 +39,7 @@ export default function Header() {
                </div>
                
                {/* Page Title */}
-               <div className="mt-6">
-                 <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                   All Tasks
-                 </h1>
-               </div>
+              
              </div>
            </div>
   )

@@ -5,10 +5,10 @@ import { Home, Clock, FileText, LayoutGrid, Briefcase, Map, Calendar, Folder } f
 import Link from 'next/link'
 
 const items = [
-  { name: 'Dashboard', icon: Home,link:'/dashboard' },
+  { name: 'Dashboard', icon: Home,link:'/app/dashboard' },
   { name: 'Time Tracking', icon: Clock },
   { name: 'Documents', icon: FileText },
-  { name: 'Tasks', icon: LayoutGrid ,link:"tasks"},
+  { name: 'Tasks', icon: LayoutGrid ,link:"/app/tasks"},
   { name: 'Lead pipeline', icon: Briefcase },
   { name: 'Invoices', icon: FileText },
   { name: 'Map', icon: Map },
@@ -21,9 +21,16 @@ export default function Sidebar() {
 
   return (
     <aside className="w-60 border-r bg-white dark:bg-gray-900 dark:bg-gray-900 flex flex-col">
-      <div className="h-14 flex items-center px-4 font-bold text-lg">
-        <span className="text-brand-500">Taskrapy</span>
-      </div>
+      <div className="flex items-center gap-6">
+                   <div className="flex items-center gap-3  px-2 py-4">
+                     <div className="w-8 h-8 bg-gray-900 dark:bg-white rounded flex items-center justify-center">
+                       <span className="text-white dark:text-gray-900 font-bold text-sm">T</span>
+                     </div>
+                     <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                       Task<span className="font-normal">rapy</span>
+                     </span>
+                   </div>
+                 </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
         {items.map((item) => {
           const Icon = item.icon
