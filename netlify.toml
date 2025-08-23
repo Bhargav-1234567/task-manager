@@ -1,9 +1,10 @@
 [build]
-  command = "next build"
+  command = "npm run build"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
-  NODE_ENV = "development"
+  NODE_ENV = "production"  # Change from development to production
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
