@@ -35,6 +35,8 @@ import {
   Settings
 } from 'lucide-react';
 import { CSS } from '@dnd-kit/utilities';
+import Modal from '../ui/Modal';
+import AddContainerForm from '../Forms/AddContainerForm';
 
 // TypeScript interfaces
 interface Assignee {
@@ -379,7 +381,7 @@ const KanbanBoard: React.FC = () => {
   const [containers, setContainers] = useState<Container[]>(initialKanbanData);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isDark, setIsDark] = useState(false);
-
+  const [addModelOpen,setAddModelOpen]=useState(false)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -557,17 +559,18 @@ const KanbanBoard: React.FC = () => {
   };
 
   const addContainer = () => {
-    const containerTitle = prompt('Enter column title:');
-    if (!containerTitle) return;
+    setAddModelOpen(true)
+    // const containerTitle = prompt('Enter column title:');
+    // if (!containerTitle) return;
 
-    const newContainer: Container = {
-      id: `container-${Date.now()}`,
-      title: containerTitle,
-      color: 'gray',
-      tasks: [],
-    };
+    // const newContainer: Container = {
+    //   id: `container-${Date.now()}`,
+    //   title: containerTitle,
+    //   color: 'gray',
+    //   tasks: [],
+    // };
 
-    setContainers(containers => [...containers, newContainer]);
+    // setContainers(containers => [...containers, newContainer]);
   };
 
   const deleteContainer = (containerId: string) => {
@@ -655,6 +658,7 @@ const KanbanBoard: React.FC = () => {
           </DndContext>
         </div>
       </div>
+    
     </div>
   );
 };

@@ -6,12 +6,13 @@ import Button from "@/components/ui/Button";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/store";
 import { addContainer } from "@/lib/kanbanSlice";
+import { Container } from "@/types";
 
 interface FormValues {
   title: string;
 }
 
-export default function AddContainerForm() {
+export default function AddContainerForm({submitCall=()=>{}}) {
   const {
     register,
     handleSubmit,
@@ -19,13 +20,15 @@ export default function AddContainerForm() {
   } = useForm<FormValues>();
 const dispatch = useDispatch<AppDispatch>();
   const onSubmit = (data: FormValues) => {
-    //  dispatch(
-    //   addContainer({
-    //     id: window.crypto.randomUUID(),
-    //     title: data.title,
-    //     taskIds: [], // must include this
-    //   })
-    // );
+   
+    const newContainer: Container = {
+      id: `container-${Date.now()}`,
+      title: data?.title,
+      color: 'gray',
+      tasks: [],
+    };
+submitCall()
+    dispatch(addContainer(newContainer));
   };
 
   return (

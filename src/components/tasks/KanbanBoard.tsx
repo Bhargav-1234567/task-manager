@@ -27,6 +27,9 @@ import {
   moveTaskBetweenContainers  
 } from '@/lib/kanbanSlice';
 import { fetchInitialData } from '@/lib/kanbanThunks';
+import Modal from '../ui/Modal';
+import AddContainerForm from '../Forms/AddContainerForm';
+import { useGetTasksBoardQuery } from '@/lib/api/taskApi';
 
 const KanbanBoard: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,7 +38,16 @@ const KanbanBoard: React.FC = () => {
   const [activeContainerId, setActiveContainerId] = useState<string | null>(null);
   const [overContainerId, setOverContainerId] = useState<string | null>(null);
   const [overTaskId, setOverTaskId] = useState<string | null>(null);
-  
+    const [addModelOpen,setAddModelOpen]=useState(false)
+    const {
+    data: boardData,
+    error:errorInBoardData,
+    isLoading:boardDataLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useGetTasksBoardQuery();
+  console.log({boardData})
   useEffect(() => {
     console.log({containers});
   }, [containers]);
@@ -217,17 +229,9 @@ const KanbanBoard: React.FC = () => {
   }, [containers, dispatch]);
 
   const addContainerHandler = useCallback(() => {
-    const containerTitle = prompt('Enter column title:');
-    if (!containerTitle) return;
-
-    const newContainer: Container = {
-      id: `container-${Date.now()}`,
-      title: containerTitle,
-      color: 'gray',
-      tasks: [],
-    };
-
-    dispatch(addContainer(newContainer));
+       setAddModelOpen(true)
+    
+ 
   }, [dispatch]);
 
   const activeTask = activeId ? findTask(activeId) : null;
@@ -311,6 +315,9 @@ const KanbanBoard: React.FC = () => {
           </DragOverlay>
         </DndContext>
       </div>
+        <Modal isOpen={addModelOpen} onClose={()=>setAddModelOpen(false)} title='Add Container'>
+        <AddContainerForm submitCall={()=>setAddModelOpen(false)} />
+      </Modal>
     </div>
   );
 };

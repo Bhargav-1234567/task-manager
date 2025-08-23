@@ -28,3 +28,40 @@ export interface Container {
   tasks: ITask[];
   color: string;
 }
+
+
+export interface CreateTaskRequest {
+  title: string;
+  description?: string;
+  status?: string;
+  priority?: 'High' | 'Normal' | 'Low';
+  dueDate?: Date;
+  assignees?: string[];
+}
+
+export interface UpdateTaskRequest extends Partial<CreateTaskRequest> {
+  id: string;
+}
+
+export interface UpdateTaskStatusRequest {
+  id: string;
+  status: string;
+}
+
+export interface TasksQueryParams {
+  status?: string;
+  priority?: string;
+  assignedTo?: string;
+  search?: string;
+}
+
+export interface BoardColumn {
+  id: string;
+  title: string;
+  color: string;
+  tasks: ITask[];
+}
+
+export interface TasksBoardResponse {
+  columns: BoardColumn[];
+}
