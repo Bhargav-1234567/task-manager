@@ -49,7 +49,7 @@ const [deleteContainerApi,{}]=useDeleteContainerMutation()
   };
 
   const handleDeleteContainer=()=>{
-// deleteContainerApi( container.id)
+  deleteContainerApi( container.id)
 deleteContainer(container.id)
   }
 

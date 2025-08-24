@@ -68,7 +68,7 @@ const [updateTask,{}]=useUpdateTaskMutation()
    useEffect(() => {
     console.log({containers});
   }, [containers]);
-
+console.log({selectedTask})
  useEffect(() => {
    
   if (movedTask) {
@@ -333,7 +333,7 @@ const [updateTask,{}]=useUpdateTaskMutation()
       </Modal>
 
       <Modal isOpen={Boolean(selectedTask)} onClose={()=>dispatch(setSelectedTask({task:null}))}>
-         <TaskForm initialData={selectedTask}/>
+         <TaskForm initialData={selectedTask} submitCall={()=>dispatch(setSelectedTask({task:null}))}/>
       </Modal>
      
     </div>

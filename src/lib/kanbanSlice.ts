@@ -105,6 +105,7 @@ const kanbanSlice = createSlice({
       taskId: string; 
       updates: Partial<ITask> 
     }>) => {
+      console.log(action.payload.updates,'action.payload.updates')
       const container = state.containers.find(c => c.id === action.payload.containerId);
       if (container) {
         const task = container.tasks.find(t => t.id === action.payload.taskId);

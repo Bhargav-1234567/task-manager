@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Calendar, Users, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp, Edit3 } from 'lucide-react';
+import { Calendar, Users, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp, Edit3, User } from 'lucide-react';
 import { ITask as Task } from '@/types';
 import { useAppDispatch } from '@/hooks/redux';
 import { updateTaskWithApi } from '@/lib/kanbanThunks';
@@ -17,7 +17,7 @@ interface TaskItemProps {
 }
 
 const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
-  const dispatch = useAppDispatch();
+   const dispatch = useAppDispatch();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task?.title || '');
@@ -162,20 +162,20 @@ dispatch(deleteTask({containerId:task.containerId||"",taskId:task.id||""}))
      
 
       {/* Date Range and Priority */}
-      {task?.dueDate && (
+      
         <div className="flex items-center gap-2 mb-3">
           <Calendar className="w-3 h-3 text-gray-400" />
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+         {task?.dueDate && ( <span className="text-xs text-gray-500 dark:text-gray-400">
             {task?.dueDate ?dayjs(task?.dueDate).format('DD-MM-YYYY'): "-" 
  }
-          </span>
+          </span>    )}
           {task?.priority && (
             <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(task.priority)}`}>
               {task?.priority}
             </span>
           )}
         </div>
-      )}
+  
 
       {/* Assignees */}
       <div className="flex items-center justify-between">
@@ -183,11 +183,11 @@ dispatch(deleteTask({containerId:task.containerId||"",taskId:task.id||""}))
           {task?.assignees?.slice(0, 3).map((assignee, index) => (
             <div
               key={assignee?.id || index}
-              className={`w-6 h-6 rounded-full ${assignee?.avatar || ''} flex items-center justify-center text-xs font-medium text-white border-2 border-white dark:border-gray-800`}
+              className={`w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-xs font-medium text-white border-2 border-white dark:border-gray-800`}
               style={{ zIndex: (task?.assignees?.length || 0) - index }}
               title={assignee?.name || ''}
             >
-              {assignee?.name?.charAt(0) || '?'}
+              {assignee?.name?.charAt(0).toLocaleUpperCase() || <User/>}
             </div>
           ))}
           {task?.assignees&& task?.assignees?.length>0&& task?.assignees?.length > 3 && (

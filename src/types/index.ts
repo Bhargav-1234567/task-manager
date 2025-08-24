@@ -3,6 +3,7 @@
  
 
 export interface Assignee {
+  _id:string,
   id: string;
   name: string;
   avatar?: string;

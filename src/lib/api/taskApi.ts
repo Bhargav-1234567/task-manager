@@ -8,7 +8,8 @@ import {
   TasksQueryParams,
   TasksBoardResponse,
   Container,
-  CreateTaskResponse
+  CreateTaskResponse,
+  Assignee
 } from '@/types';
 
 export interface BulkSortUpdateRequest {
@@ -101,6 +102,11 @@ export const taskApi = createApi({
       query: (id) => `/tasks/${id}`,
       providesTags: (result, error, id) => [{ type: 'Task', id }],
     }),
+
+     getUsersList: builder.query<Assignee[], string>({
+      query: (id) => `/auth/users`,
+     }),
+
 
   createTask: builder.mutation<CreateTaskResponse, CreateTaskRequest>({
   query: (newTask) => ({
@@ -248,5 +254,6 @@ export const {
   useCreateContainerMutation,
   useReorderTasksInContainerMutation,
   useBulkUpdateSortIndexMutation,
-  useDeleteContainerMutation
+  useDeleteContainerMutation,
+  useGetUsersListQuery
 } = taskApi;

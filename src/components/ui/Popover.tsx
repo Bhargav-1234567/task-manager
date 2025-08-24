@@ -104,7 +104,7 @@ export default function Popover({
       {open &&
         createPortal(
           <div
-          onClick={e=>{setUncontrolledOpen(false); e.preventDefault()}}
+          onClick={e=>{setUncontrolledOpen(false); e.stopPropagation()}}
             ref={popoverRef}
             style={{ top: position.top, left: position.left }}
             className="fixed z-[1000] w-44"

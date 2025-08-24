@@ -1,4 +1,4 @@
-import { useUpdateTaskMutation } from '@/lib/api/taskApi';
+import { useGetUsersListQuery, useUpdateTaskMutation } from '@/lib/api/taskApi';
 import { updateTask } from '@/lib/kanbanSlice';
 import { ITask } from '@/types';
 import React from 'react';
@@ -15,21 +15,27 @@ interface TaskFormProps {
   initialData?: ITask;
   onSubmit: (data: ITask) => void;
   onCancel?: () => void;
-  isLoading?: boolean;
-}
+  submitCall?:()=>void;
+ }
 
 const TaskForm: React.FC<TaskFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
-  isLoading = false
-}) => {
+  submitCall
+ }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ITask>({
-    defaultValues: initialData || {
+    defaultValues: initialData ?{
+    ...initialData,
+    assignees:initialData?.assignees?.map(item=>item.id||item._id),
+    dueDate: initialData?.dueDate
+      ? new Date(initialData.dueDate).toISOString().split("T")[0] // ✅ YYYY-MM-DD
+      : ""
+  }: {
       title: '',
       dueDate: '',
       description: '',
@@ -39,27 +45,23 @@ const TaskForm: React.FC<TaskFormProps> = ({
       status: ''
     }
   });
-
-  const [updateTaskApi] = useUpdateTaskMutation();
+  const {data:assigneeOptions}=useGetUsersListQuery('1');
+  const [updateTaskApi,{isLoading}] = useUpdateTaskMutation();
   const dispatch = useDispatch();
-
-  const statusOptions = ['To Do', 'In Progress', 'Review', 'Done'];
+   const statusOptions = ['To Do', 'In Progress', 'Review', 'Done'];
   const labelOptions = ['Frontend', 'Backend', 'UI/UX', 'Bug', 'Feature'];
-  const assigneeOptions: Assignee[] = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Smith' },
-    { id: '3', name: 'Robert Johnson' },
-    { id: '4', name: 'Emily Davis' }
-  ];
-
-  const handleFormSubmit = (data: ITask) => {
+ 
+   const handleFormSubmit = (data: ITask) => {
+    console.log({data})
     if (initialData?.id) {
-      updateTaskApi({ ...data });
-      dispatch(updateTask({ containerId: initialData.containerId || "", taskId: initialData.id, updates: data }));
+      updateTaskApi({ ...data }).then(()=>{
+        submitCall&&submitCall()
+      });
+     
+      dispatch(updateTask({ containerId: initialData.containerId || "", taskId: initialData.id, updates: {...data,assignees:assigneeOptions?.filter(item=>data.assignees?.includes(item?._id))} }));
     }
   };
-
-  return (
+   return (
     <div className="h-[calc(100vh-100px)] overflow-auto max-w-2xl mx-auto p-6 
       bg-white dark:bg-gray-900 rounded-lg shadow-md 
       text-gray-900 dark:text-gray-100">
@@ -200,11 +202,11 @@ const TaskForm: React.FC<TaskFormProps> = ({
             Assignees
           </label>
           <div className="space-y-2">
-            {assigneeOptions.map((assignee) => (
+            {assigneeOptions?.map((assignee) => (
               <label key={assignee.id} className="flex items-center">
                 <input
                   type="checkbox"
-                  value={assignee.id}
+                  value={assignee?._id}
                   className="rounded text-blue-600 focus:ring-blue-500"
                   {...register('assignees')}
                 />
@@ -216,17 +218,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-4 pt-4">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium 
-              text-gray-700 dark:text-gray-200 
-              bg-gray-100 dark:bg-gray-800 
-              rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 
-              focus:outline-none focus:ring-2 focus:ring-gray-500"
-          >
-            Cancel
-          </button>
+          
           <button
             type="submit"
             disabled={isLoading}
