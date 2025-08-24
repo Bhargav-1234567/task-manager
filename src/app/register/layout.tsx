@@ -4,6 +4,7 @@ import AppLayout from '@/components/layout/AppLayout'
 import { getServerUser } from '@/lib/auth/serverAuth'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { ThemeProvider } from 'next-themes'
 
 export const metadata: Metadata = {
   title: 'Task Manager',
@@ -15,7 +16,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-           <Suspense fallback={<div>Loading...</div>}> {children} </Suspense> 
+           <Suspense fallback={<div>Loading...</div>}><ThemeProvider  attribute="class" defaultTheme="dark" enableSystem> {children}</ThemeProvider> </Suspense> 
       </body>
     </html>
   )

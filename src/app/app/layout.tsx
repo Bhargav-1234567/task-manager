@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import AppLayout from '@/components/layout/AppLayout'
 import { getServerUser } from '@/lib/auth/serverAuth'
 import { redirect } from 'next/navigation'
+import { ThemeProvider } from 'next-themes'
 
 export const metadata: Metadata = {
   title: 'Task Manager',
@@ -19,7 +20,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-            <AppLayout> {children}</AppLayout>
+            <ThemeProvider  attribute="class" defaultTheme="dark" enableSystem> <AppLayout> {children}</AppLayout></ThemeProvider>
       </body>
     </html>
   )

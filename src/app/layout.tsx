@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
-import Providers from '@/components/Providers'
-import ThemeToggle from '@/components/ThemeToggle'
-import Nav from '@/components/Nav'
-import AppLayout from '@/components/layout/AppLayout'
+import Providers from '@/components/Providers' 
 import './globals.css'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export const metadata: Metadata = {
   title: 'Task Manager',
@@ -14,7 +12,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-           <Providers>{children}</Providers>
+           <Providers>       
+{children}</Providers>
       </body>
     </html>
   )

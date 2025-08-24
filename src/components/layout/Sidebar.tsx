@@ -6,14 +6,14 @@ import Link from 'next/link'
 
 const items = [
   { name: 'Dashboard', icon: Home,link:'/app/dashboard' },
-  { name: 'Time Tracking', icon: Clock },
-  { name: 'Documents', icon: FileText },
+  { name: 'Time Tracking', icon: Clock,link:"/app/timeTracking" },
+  { name: 'Documents', icon: FileText,link:"/app/documents" },
   { name: 'Tasks', icon: LayoutGrid ,link:"/app/tasks"},
-  { name: 'Lead pipeline', icon: Briefcase },
-  { name: 'Invoices', icon: FileText },
-  { name: 'Map', icon: Map },
-  { name: 'Schedule', icon: Calendar },
-  { name: 'Projects', icon: Folder },
+  { name: 'Lead pipeline', icon: Briefcase,link:"/app/leadPipeline" },
+  { name: 'Invoices', icon: FileText,link:"/app/invoices" },
+  { name: 'Map', icon: Map ,link:"/app/map"},
+  { name: 'Schedule', icon: Calendar,link:"/app/schedule" },
+  { name: 'Projects', icon: Folder,link:"/app/projects" },
 ]
 
 export default function Sidebar() {

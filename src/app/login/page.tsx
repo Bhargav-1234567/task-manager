@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useLoginMutation } from "@/lib/api/authApi"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-
+ 
 export default function LoginPage() {
   const [email, setEmail] = useState("john@example.com")
   const [password, setPassword] = useState("password123")
@@ -37,7 +37,6 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center">
           Login
         </h1>
-        
         {error && (
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-md text-sm">
             {error}

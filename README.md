@@ -34,3 +34,14 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+Tech stack used
+Next JS, tailwind, cookie, Node JS, express JS, JWT, 
+
+live URLs
+## Frontend
+https://task-manager-next-zen.netlify.app
+
+## Backend
+https://task-manager-backend-04g0.onrender.com/
