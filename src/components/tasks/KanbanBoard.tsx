@@ -37,6 +37,7 @@ import AddTaskForm from '../Forms/AddTaskForm';
 import { useKanbanBackendSync } from '@/hooks/useKanbanBackendSync';
 import TasksHeader from './TasksHeader';
 import TaskForm from '../Forms/TaskForm';
+import TaskListView from './TaskListView';
 
 interface KanbanBoardProps {
   containersFromApi: Container[];
@@ -335,7 +336,8 @@ console.log({selectedTask})
       <Modal isOpen={Boolean(selectedTask)} onClose={()=>dispatch(setSelectedTask({task:null}))}>
          <TaskForm initialData={selectedTask} submitCall={()=>dispatch(setSelectedTask({task:null}))}/>
       </Modal>
-     
+         {/* <TaskListView data={containers}/> */}
+
     </div>
   );
 };
