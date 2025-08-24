@@ -10,16 +10,19 @@ export interface Assignee {
 }
 
 export interface ITask {
+  _id?:string,
   id: string;
   title: string;
-  dateRange?:string,
+  dueDate?:string,
   description?: string;
-  dueDate?: Date;
-  priority: 'High' | 'Normal' | 'Low';
+   priority: 'High' | 'Normal' | 'Low';
+  labels?:string[],
   assignees?: Assignee[];
-  likes: number;
-  comments: number;
+   likes?: number;
+  comments?: number;
   status?: string; // This will match the container title
+  createdBy?:Assignee,
+   sortIndex:number
 }
 
 export interface Container {
@@ -37,7 +40,29 @@ export interface CreateTaskRequest {
   priority?: 'High' | 'Normal' | 'Low';
   dueDate?: Date;
   assignees?: string[];
+  createdBy?:string,
+  containerId:string,
+   sortIndex:number
 }
+
+export interface CreateTaskResponse{
+  _id: string;
+  id:string;
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  labels: string[];
+  assignees: string[];
+  createdBy: Assignee;
+  timeTracked: number;
+  attachments: string[];
+  createdAt: string; // or Date if you prefer to use Date objects
+  updatedAt: string; // or Date if you prefer to use Date objects
+  __v: number;
+  sortIndex:number
+}
+
 
 export interface UpdateTaskRequest extends Partial<CreateTaskRequest> {
   id: string;

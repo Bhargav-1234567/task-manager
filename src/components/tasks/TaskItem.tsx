@@ -16,8 +16,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
   const dispatch = useAppDispatch();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(task.title);
-  const [editDescription, setEditDescription] = useState(task.description);
+  const [editTitle, setEditTitle] = useState(task?.title || '');
+  const [editDescription, setEditDescription] = useState(task?.description || '');
   
   const {
     attributes,
@@ -26,7 +26,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: task.id });
+  } = useSortable({ id: task?.id || '' });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -43,6 +43,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
   };
 
   const handleSaveEdit = () => {
+    if (!task?.id || !containerId) return;
+    
     dispatch(updateTaskWithApi({
       containerId,
       taskId: task.id,
@@ -55,10 +57,14 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
   };
 
   const handleCancelEdit = () => {
-    setEditTitle(task.title);
-    setEditDescription(task.description);
+    setEditTitle(task?.title || '');
+    setEditDescription(task?.description || '');
     setIsEditing(false);
   };
+
+  if (!task) {
+    return null; // Or a loading/placeholder component
+  }
 
   return (
     <div
@@ -88,7 +94,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
             className="text-sm font-medium text-gray-900 dark:text-gray-100 flex-1 leading-5 cursor-pointer"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            {task.title}
+            {task?.title || 'Untitled Task'}
           </h4>
         )}
         <div className="flex items-center gap-1">
@@ -126,7 +132,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
             />
           ) : (
             <p className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700/50 p-2 rounded">
-              {task.description || 'No description'}
+              {task?.description || 'No description'}
             </p>
           )}
         </div>
@@ -151,15 +157,17 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
       )}
 
       {/* Date Range and Priority */}
-      {task.dateRange && (
+      {task?.dueDate && (
         <div className="flex items-center gap-2 mb-3">
           <Calendar className="w-3 h-3 text-gray-400" />
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {task.dateRange}
+            {task?.dueDate}
           </span>
-          <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(task.priority)}`}>
-            {task.priority}
-          </span>
+          {task?.priority && (
+            <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(task.priority)}`}>
+              {task?.priority}
+            </span>
+          )}
         </div>
       )}
 
@@ -168,15 +176,15 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
         <div className="flex -space-x-2">
           {task?.assignees?.slice(0, 3).map((assignee, index) => (
             <div
-              key={assignee.id}
-              className={`w-6 h-6 rounded-full ${assignee.avatar} flex items-center justify-center text-xs font-medium text-white border-2 border-white dark:border-gray-800`}
-              style={{ zIndex:( task?.assignees?.length||0) - index }}
-              title={assignee.name}
+              key={assignee?.id || index}
+              className={`w-6 h-6 rounded-full ${assignee?.avatar || ''} flex items-center justify-center text-xs font-medium text-white border-2 border-white dark:border-gray-800`}
+              style={{ zIndex: (task?.assignees?.length || 0) - index }}
+              title={assignee?.name || ''}
             >
-              {assignee.name.charAt(0)}
+              {assignee?.name?.charAt(0) || '?'}
             </div>
           ))}
-          {task?.assignees?.length&& task?.assignees?.length > 3 && (
+          {task?.assignees?.length && task?.assignees?.length > 3 && (
             <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 border-2 border-white dark:border-gray-800">
               +{task?.assignees?.length - 3}
             </div>
@@ -187,11 +195,11 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
         <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-1">
             <Users className="w-3 h-3" />
-            <span>{task.likes}</span>
+            <span>{task?.likes || 0}</span>
           </div>
           <div className="flex items-center gap-1">
             <MessageCircle className="w-3 h-3" />
-            <span>{task.comments}</span>
+            <span>{task?.comments || 0}</span>
           </div>
         </div>
       </div>

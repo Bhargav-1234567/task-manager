@@ -48,7 +48,7 @@ interface Assignee {
 interface Task {
   id: string;
   title: string;
-  dateRange?: string;
+  dueDate?: string;
   priority: 'High' | 'Normal' | 'Low';
   assignees: Assignee[];
   likes: number;
@@ -79,7 +79,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-1', 
         title: 'Mobile app design',
-        dateRange: 'Ap 1, 24 - Dec 2, 24',
+        dueDate: 'Ap 1, 24 - Dec 2, 24',
         priority: 'High',
         assignees: [
           { id: 'user-1', name: 'John', avatar: 'bg-blue-500' },
@@ -92,7 +92,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-2', 
         title: 'Design system creation from scratch',
-        dateRange: 'Dec 2, 24',
+        dueDate: 'Dec 2, 24',
         priority: 'Normal',
         assignees: [
           { id: 'user-4', name: 'Anna', avatar: 'bg-pink-500' },
@@ -104,7 +104,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-3', 
         title: 'Research web app',
-        dateRange: 'Dec 2, 24',
+        dueDate: 'Dec 2, 24',
         priority: 'Low',
         assignees: [
           { id: 'user-6', name: 'Lisa', avatar: 'bg-indigo-500' }
@@ -122,7 +122,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-4', 
         title: 'Solar web app design for big change',
-        dateRange: 'Dec 2, 24',
+        dueDate: 'Dec 2, 24',
         priority: 'High',
         assignees: [
           { id: 'user-7', name: 'Alex', avatar: 'bg-blue-500' },
@@ -135,7 +135,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-5', 
         title: 'Design system creation from scratch',
-        dateRange: 'Dec 2, 24',
+        dueDate: 'Dec 2, 24',
         priority: 'Normal',
         assignees: [
           { id: 'user-10', name: 'David', avatar: 'bg-pink-500' },
@@ -147,7 +147,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-6', 
         title: 'Research web app',
-        dateRange: 'Dec 2, 24',
+        dueDate: 'Dec 2, 24',
         priority: 'Low',
         assignees: [
           { id: 'user-12', name: 'Ryan', avatar: 'bg-indigo-500' }
@@ -165,7 +165,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-7', 
         title: 'Mobile app design',
-        dateRange: 'Dec 2, 24',
+        dueDate: 'Dec 2, 24',
         priority: 'High',
         assignees: [
           { id: 'user-13', name: 'Maya', avatar: 'bg-blue-500' },
@@ -178,7 +178,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-8', 
         title: 'Mobile app deign',
-        dateRange: 'Apr 1, 24 - Dec 2, 24',
+        dueDate: 'Apr 1, 24 - Dec 2, 24',
         priority: 'Normal',
         assignees: [
           { id: 'user-16', name: 'Ben', avatar: 'bg-pink-500' },
@@ -190,7 +190,7 @@ const initialKanbanData: Container[] = [
       { 
         id: 'task-9', 
         title: 'Research web app',
-        dateRange: 'Dec 2, 24',
+        dueDate: 'Dec 2, 24',
         priority: 'Low',
         assignees: [
           { id: 'user-18', name: 'Sam', avatar: 'bg-indigo-500' }
@@ -251,11 +251,11 @@ const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
       </div>
 
       {/* Date Range */}
-      {task.dateRange && (
+      {task.dueDate && (
         <div className="flex items-center gap-2 mb-3">
           <Calendar className="w-3 h-3 text-gray-400" />
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {task.dateRange}
+            {task.dueDate}
           </span>
           <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(task.priority)}`}>
             {task.priority}

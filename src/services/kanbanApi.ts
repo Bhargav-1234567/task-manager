@@ -17,7 +17,7 @@ export const kanbanApi = {
           { 
             id: 'task-1', 
             title: 'Mobile app design',
-            dateRange: 'Ap 1, 24 - Dec 2, 24',
+            dueDate: 'Ap 1, 24 - Dec 2, 24',
             priority: 'High',
             assignees: [
               { id: 'user-1', name: 'John', avatar: 'bg-blue-500' },
@@ -30,7 +30,7 @@ export const kanbanApi = {
           { 
             id: 'task-2', 
             title: 'Design system creation from scratch',
-            dateRange: 'Dec 2, 24',
+            dueDate: 'Dec 2, 24',
             priority: 'Normal',
             assignees: [
               { id: 'user-4', name: 'Anna', avatar: 'bg-pink-500' },
@@ -42,7 +42,7 @@ export const kanbanApi = {
           { 
             id: 'task-3', 
             title: 'Research web app',
-            dateRange: 'Dec 2, 24',
+            dueDate: 'Dec 2, 24',
             priority: 'Low',
             assignees: [
               { id: 'user-6', name: 'Lisa', avatar: 'bg-indigo-500' }
@@ -60,7 +60,7 @@ export const kanbanApi = {
           { 
             id: 'task-4', 
             title: 'Solar web app design for big change',
-            dateRange: 'Dec 2, 24',
+            dueDate: 'Dec 2, 24',
             priority: 'High',
             assignees: [
               { id: 'user-7', name: 'Alex', avatar: 'bg-blue-500' },
@@ -73,7 +73,7 @@ export const kanbanApi = {
           { 
             id: 'task-5', 
             title: 'Design system creation from scratch',
-            dateRange: 'Dec 2, 24',
+            dueDate: 'Dec 2, 24',
             priority: 'Normal',
             assignees: [
               { id: 'user-10', name: 'David', avatar: 'bg-pink-500' },
@@ -85,7 +85,7 @@ export const kanbanApi = {
           { 
             id: 'task-6', 
             title: 'Research web app',
-            dateRange: 'Dec 2, 24',
+            dueDate: 'Dec 2, 24',
             priority: 'Low',
             assignees: [
               { id: 'user-12', name: 'Ryan', avatar: 'bg-indigo-500' }
@@ -103,7 +103,7 @@ export const kanbanApi = {
           { 
             id: 'task-7', 
             title: 'Mobile app design',
-            dateRange: 'Dec 2, 24',
+            dueDate: 'Dec 2, 24',
             priority: 'High',
             assignees: [
               { id: 'user-13', name: 'Maya', avatar: 'bg-blue-500' },
@@ -116,7 +116,7 @@ export const kanbanApi = {
           { 
             id: 'task-8', 
             title: 'Mobile app deign',
-            dateRange: 'Apr 1, 24 - Dec 2, 24',
+            dueDate: 'Apr 1, 24 - Dec 2, 24',
             priority: 'Normal',
             assignees: [
               { id: 'user-16', name: 'Ben', avatar: 'bg-pink-500' },
@@ -128,7 +128,7 @@ export const kanbanApi = {
           { 
             id: 'task-9', 
             title: 'Research web app',
-            dateRange: 'Dec 2, 24',
+            dueDate: 'Dec 2, 24',
             priority: 'Low',
             assignees: [
               { id: 'user-18', name: 'Sam', avatar: 'bg-indigo-500' }

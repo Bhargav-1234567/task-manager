@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/store";
 import { addContainer } from "@/lib/kanbanSlice";
 import { Container } from "@/types";
+import { useCreateContainerMutation } from "@/lib/api/taskApi";
 
 interface FormValues {
   title: string;
@@ -19,16 +20,22 @@ export default function AddContainerForm({submitCall=()=>{}}) {
     formState: { errors, isSubmitting },
   } = useForm<FormValues>();
 const dispatch = useDispatch<AppDispatch>();
+  const [addContainerApi,{isLoading:containerAdding}]=    useCreateContainerMutation();
+
   const onSubmit = (data: FormValues) => {
    
-    const newContainer: Container = {
-      id: `container-${Date.now()}`,
-      title: data?.title,
+  
+    addContainerApi({title:data?.title,color:'gray'}).then((data)=>{
+  const newContainer: Container = {
+      id: data.data?._id,
+      title: data.data?.title,
       color: 'gray',
       tasks: [],
     };
-submitCall()
-    dispatch(addContainer(newContainer));
+        dispatch(addContainer(newContainer));
+
+    })
+    submitCall()
   };
 
   return (

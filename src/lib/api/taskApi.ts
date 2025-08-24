@@ -6,9 +6,11 @@ import {
   UpdateTaskRequest,
   UpdateTaskStatusRequest,
   TasksQueryParams,
-  TasksBoardResponse
+  TasksBoardResponse,
+  Container,
+  CreateTaskResponse
 } from '@/types';
-
+ 
 // Plain fetchBaseQuery
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_BACKEND_URL, // All task APIs hit backend
@@ -73,16 +75,18 @@ export const taskApi = createApi({
       providesTags: (result, error, id) => [{ type: 'Task', id }],
     }),
 
-    createTask: builder.mutation<ITask, CreateTaskRequest>({
-      query: (newTask) => ({
-        url: '/tasks',
-        method: 'POST',
-        body: newTask,
-      }),
-      invalidatesTags: [{ type: 'Task', id: 'LIST' }, { type: 'TasksBoard' }],
-    }),
+  createTask: builder.mutation<CreateTaskResponse, CreateTaskRequest>({
+  query: (newTask) => ({
+    url: '/tasks',
+    method: 'POST',
+    body: newTask,
+  }),
+  
+ 
+  invalidatesTags: [{ type: 'Task', id: 'LIST' }, { type: 'TasksBoard' }],
+}),
 
-    updateTask: builder.mutation<ITask, UpdateTaskRequest>({
+    updateTask: builder.mutation<ITask, ITask>({
       query: ({ id, ...updates }) => ({
         url: `/tasks/${id}`,
         method: 'PUT',
@@ -118,6 +122,18 @@ export const taskApi = createApi({
       ],
     }),
 
+    createContainer: builder.mutation<Container,{title:string,color:string}>({
+      query: ({ title, color }) => ({
+        url: `/sections`,
+        method: 'POST',
+        body: { title, color },
+      }),
+      invalidatesTags: (result, error) => [
+        
+        { type: 'TasksBoard' },
+      ],
+    }),
+
     getTasksBoard: builder.query<TasksBoardResponse, void>({
       query: () => `/tasks/board`,
       providesTags: ['TasksBoard'],
@@ -130,8 +146,8 @@ export const taskApi = createApi({
             id: task.id,
             title: task.title,
             description: task.description,
-            dateRange: task.dateRange,
-            dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
+            dueDate: task.dueDate,
+            // dueDate: task.dueDate ? new Date(task.dueDate) : undefined,
             priority: task.priority,
             assignees: task.assignees,
             likes: task.likes || 0,
@@ -153,4 +169,5 @@ export const {
   useDeleteTaskMutation,
   useUpdateTaskStatusMutation,
   useGetTasksBoardQuery,
+  useCreateContainerMutation
 } = taskApi;

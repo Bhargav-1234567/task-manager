@@ -84,10 +84,10 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
         </div>
       </div>
       
-      <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={tasks.map(task => task?.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col flex-1">
-          {tasks.map((task) => (
-            <TaskItem containerId={container.id} key={task.id} task={task} />
+          {tasks.length > 0 && tasks.map((task) => (
+            <TaskItem containerId={container.id} key={task?.id} task={task} />
           ))}
           
           {/* Add New Task Button */}

@@ -18,9 +18,9 @@ export default function LoginPage() {
     
     try {
       const result = await login({ email, password }).unwrap()
-        
-      if (result.ok) {
+       if (result.ok) {
          localStorage.setItem('token',result?.user?.token||"")
+         localStorage.setItem('userData',JSON.stringify( result?.user  ))
         router.push(redirectTo)
       } else {
         setError(result.message  || "Invalid credentials")

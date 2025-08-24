@@ -24,20 +24,32 @@ import {
   addContainer, 
   addTask, 
   moveTaskWithinContainer, 
-  moveTaskBetweenContainers  
+  moveTaskBetweenContainers,  
+  setInitialData,
+  resetLastMovedTask
 } from '@/lib/kanbanSlice';
 import { fetchInitialData } from '@/lib/kanbanThunks';
 import Modal from '../ui/Modal';
 import AddContainerForm from '../Forms/AddContainerForm';
-import { useGetTasksBoardQuery } from '@/lib/api/taskApi';
+import { useCreateContainerMutation, useGetTasksBoardQuery, useUpdateTaskMutation, useUpdateTaskStatusMutation } from '@/lib/api/taskApi';
+import AddTaskForm from '../Forms/AddTaskForm';
 
-const KanbanBoard: React.FC = () => {
+interface KanbanBoardProps {
+  containersFromApi: Container[];
+  // You can add other props here
+  // example: onItemMove?: (itemId: string, newContainerId: string) => void;
+}
+const KanbanBoard: React.FC<KanbanBoardProps> = ({containersFromApi}) => {
   const dispatch = useAppDispatch();
-  const { containers, isLoading, error } = useAppSelector(state => state.kanban);
+  const {  containers, isLoading, error } = useAppSelector(state => state.kanban);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [selectedcontainer,setSelectedContainer]=useState<string|"">("")
+  const [openAddCardModel,setOpenaaddCardModel]=useState(false)
   const [activeContainerId, setActiveContainerId] = useState<string | null>(null);
   const [overContainerId, setOverContainerId] = useState<string | null>(null);
   const [overTaskId, setOverTaskId] = useState<string | null>(null);
+  const movedTask = useAppSelector((state) => state.kanban.lastMovedTask);
+
     const [addModelOpen,setAddModelOpen]=useState(false)
     const {
     data: boardData,
@@ -47,15 +59,26 @@ const KanbanBoard: React.FC = () => {
     isError,
     refetch,
   } = useGetTasksBoardQuery();
-  console.log({boardData})
-  useEffect(() => {
+const [updateTask,{}]=useUpdateTaskMutation()
+   useEffect(() => {
     console.log({containers});
   }, [containers]);
 
+ useEffect(() => {
+   
+  if (movedTask) {
+    // Do something with the moved task
+    console.log('Task moved:', movedTask);
+    updateTask({...movedTask})
+    // Reset after use
+    dispatch(resetLastMovedTask());
+  }
+}, [movedTask, dispatch]);
+
   // Load initial data on component mount
   useEffect(() => {
-    dispatch(fetchInitialData());
-  }, [dispatch]);
+     dispatch(setInitialData(containersFromApi));
+  }, [dispatch,containersFromApi]);
 
   // Optimize sensors with proper configuration
   const sensors = useSensors(
@@ -68,7 +91,7 @@ const KanbanBoard: React.FC = () => {
 
   // Memoize container and task IDs for better performance
   const containerIds = useMemo(() => containers.map(c => c.id), [containers]);
-  const taskIds = useMemo(() => containers.flatMap(c => c.tasks.map(t => t.id)), [containers]);
+  const taskIds = useMemo(() => containers.flatMap(c => c.tasks.map(t => t?.id)), [containers]);
 
   // Memoize the findContainer function
   const findContainer = useCallback((id: string): Container | undefined => {
@@ -157,7 +180,6 @@ const KanbanBoard: React.FC = () => {
       setActiveId(null);
       return;
     }
-
     // Handle task movement within the same container
     if (activeContainer.id === overContainer.id) {
       const activeIndex = activeContainer.tasks.findIndex(t => t.id === activeId);
@@ -203,31 +225,12 @@ const KanbanBoard: React.FC = () => {
     setActiveId(null);
   }, [taskIds, findContainer, dispatch]);
 
+  
+
   const addTaskHandler = useCallback((containerId: string) => {
-    const container = containers.find(c => c.id === containerId);
-    if (!container) return;
-
-    const taskTitle = prompt('Enter task title:');
-    if (!taskTitle) return;
-
-    const taskDescription = prompt('Enter task description:') || "";
-
-    const newTask: Task = {
-      id: `task-${Date.now()}`,
-      title: taskTitle,
-      description: taskDescription,
-      priority: 'Normal',
-      assignees: [
-        { id: `user-${Date.now()}`, name: 'You', avatar: 'bg-blue-500' }
-      ],
-      likes: 0,
-      comments: 0,
-      status: container.title
-    };
-
-    dispatch(addTask({ containerId, task: newTask }));
+    setSelectedContainer(containerId)
+    setOpenaaddCardModel(true)
   }, [containers, dispatch]);
-
   const addContainerHandler = useCallback(() => {
        setAddModelOpen(true)
     
@@ -317,6 +320,10 @@ const KanbanBoard: React.FC = () => {
       </div>
         <Modal isOpen={addModelOpen} onClose={()=>setAddModelOpen(false)} title='Add Container'>
         <AddContainerForm submitCall={()=>setAddModelOpen(false)} />
+      </Modal>
+
+       <Modal isOpen={openAddCardModel} onClose={()=>setOpenaaddCardModel(false)} title='Add Task'>
+        <AddTaskForm  containerId={selectedcontainer} containers={containers} submitCall={()=>setOpenaaddCardModel(false)} />
       </Modal>
     </div>
   );
