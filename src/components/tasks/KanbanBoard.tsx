@@ -26,13 +26,17 @@ import {
   moveTaskWithinContainer, 
   moveTaskBetweenContainers,  
   setInitialData,
-  resetLastMovedTask
+  resetLastMovedTask,
+  setSelectedTask
 } from '@/lib/kanbanSlice';
 import { fetchInitialData } from '@/lib/kanbanThunks';
 import Modal from '../ui/Modal';
 import AddContainerForm from '../Forms/AddContainerForm';
 import { useCreateContainerMutation, useGetTasksBoardQuery, useUpdateTaskMutation, useUpdateTaskStatusMutation } from '@/lib/api/taskApi';
 import AddTaskForm from '../Forms/AddTaskForm';
+import { useKanbanBackendSync } from '@/hooks/useKanbanBackendSync';
+import TasksHeader from './TasksHeader';
+import TaskForm from '../Forms/TaskForm';
 
 interface KanbanBoardProps {
   containersFromApi: Container[];
@@ -41,7 +45,7 @@ interface KanbanBoardProps {
 }
 const KanbanBoard: React.FC<KanbanBoardProps> = ({containersFromApi}) => {
   const dispatch = useAppDispatch();
-  const {  containers, isLoading, error } = useAppSelector(state => state.kanban);
+  const {  containers, isLoading, error,selectedTask } = useAppSelector(state => state.kanban);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedcontainer,setSelectedContainer]=useState<string|"">("")
   const [openAddCardModel,setOpenaaddCardModel]=useState(false)
@@ -49,6 +53,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({containersFromApi}) => {
   const [overContainerId, setOverContainerId] = useState<string | null>(null);
   const [overTaskId, setOverTaskId] = useState<string | null>(null);
   const movedTask = useAppSelector((state) => state.kanban.lastMovedTask);
+  const { syncContainerToBackend, syncAllToBackend } = useKanbanBackendSync();
 
     const [addModelOpen,setAddModelOpen]=useState(false)
     const {
@@ -241,7 +246,7 @@ const [updateTask,{}]=useUpdateTaskMutation()
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="h-[calc(100vh-96px)] bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="text-lg text-gray-600 dark:text-gray-400">Loading...</div>
       </div>
     );
@@ -249,15 +254,16 @@ const [updateTask,{}]=useUpdateTaskMutation()
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+      <div className="h-[calc(100vh-96px)] bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="text-lg text-red-600 dark:text-red-400">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="h-[calc(100vh-120px)] transition-colors duration-300">
       {/* Kanban Board */}
+      <TasksHeader/>
       <div className="max-w-7xl mx-auto">
         <DndContext
           sensors={sensors}
@@ -325,6 +331,11 @@ const [updateTask,{}]=useUpdateTaskMutation()
        <Modal isOpen={openAddCardModel} onClose={()=>setOpenaaddCardModel(false)} title='Add Task'>
         <AddTaskForm  containerId={selectedcontainer} containers={containers} submitCall={()=>setOpenaaddCardModel(false)} />
       </Modal>
+
+      <Modal isOpen={Boolean(selectedTask)} onClose={()=>dispatch(setSelectedTask({task:null}))}>
+         <TaskForm initialData={selectedTask}/>
+      </Modal>
+     
     </div>
   );
 };

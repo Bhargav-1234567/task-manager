@@ -4,7 +4,7 @@ import Header from './Header'
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     
-    <div className="flex h-screen bg-neutral-50 dark:bg-gray-900 text-neutral-900 dark:text-neutral-100">
+    <div className="flex h-screen  bg-white dark:bg-gray-900 text-neutral-900 dark:text-neutral-100">
       <Sidebar />
       <div className="w-[calc(100%-15rem)] flex flex-col">
         <Header />

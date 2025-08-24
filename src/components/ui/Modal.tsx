@@ -41,7 +41,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div
         ref={modalRef}
-        className="min-h-32 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-2xl shadow-xl w-full max-w-md p-6 relative"
+        className="min-h-32 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-2xl shadow-xl w-full max-w-lg p-6 relative"
       >
         <Button variant="ghost" size="sm" className=" absolute top-4 right-4" onClick={onClose}> <XIcon/></Button>
        

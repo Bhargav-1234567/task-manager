@@ -1,19 +1,21 @@
 // store/slices/kanbanSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Container, ITask as Task, Assignee } from '@/types';
+import { Container, ITask as Task, Assignee, ITask } from '@/types';
 
 interface KanbanState {
   containers: Container[];
   isLoading: boolean;
   error: string | null;
   lastMovedTask: Task | null; 
+  selectedTask:Task|null
 }
 
 const initialState: KanbanState = {
   containers: [],
   isLoading: false,
   error: null,
-  lastMovedTask: null
+  lastMovedTask: null,
+  selectedTask:null
 };
 
 // Helper function to generate a sort index (can be based on timestamp or sequence)
@@ -144,6 +146,17 @@ moveTaskWithinContainer: (state, action: PayloadAction<{
   }
 },
 
+setSelectedTask: (state, action: PayloadAction<{
+  task: ITask|null
+ 
+}>) => {
+ 
+    console.log(action.payload.task,'asdasdasdasd')
+    // Set the moved task with updated sortIndex
+    state.selectedTask =  action.payload.task;
+   
+},
+
 moveTaskBetweenContainers: (state, action: PayloadAction<{
   fromContainerId: string;
   toContainerId: string;
@@ -206,7 +219,8 @@ export const {
   moveTaskWithinContainer,
   moveTaskBetweenContainers,
   normalizeAllSortIndices,
-  resetLastMovedTask
+  resetLastMovedTask,
+  setSelectedTask
 } = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;

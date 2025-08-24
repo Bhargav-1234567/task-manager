@@ -22,7 +22,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           id={textareaId}
           ref={ref}
-          className={`px-4 py-2 rounded-xl border outline-none resize-none
+          className={`px-4 py-2 rounded border outline-none resize-none
             bg-white dark:bg-gray-900 
             text-gray-900 dark:text-gray-100
             placeholder-gray-400 dark:placeholder-gray-500

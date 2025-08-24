@@ -5,7 +5,7 @@
 export interface Assignee {
   id: string;
   name: string;
-  avatar: string;
+  avatar?: string;
   email?:string
 }
 

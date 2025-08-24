@@ -50,11 +50,11 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       ref={setNodeRef}
       style={style}
       className={`
-        flex flex-col min-h-[600px] w-[320px] flex-shrink-0 rounded-lg bg-gray-50 dark:bg-gray-800/50 p-4
+        flex flex-col h-[calc(100vh-96px-33px-40px)] overflow-auto w-[320px] flex-shrink-0 rounded-lg bg-gray-50 dark:bg-gray-800/50 p-4
         ${isDragging ? 'opacity-50' : ''}
       `}
     >
-      <div className="flex items-center justify-between mb-4" {...attributes} {...listeners}>
+      <div className="flex items-center justify-between mb-4 border-b-2 border-indigo-600 pb-3" {...attributes} {...listeners}>
         <div className="flex items-center gap-3">
           <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
           <h3 

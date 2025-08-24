@@ -6,6 +6,7 @@ import { Calendar, Users, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp,
 import { ITask as Task } from '@/types';
 import { useAppDispatch } from '@/hooks/redux';
 import { updateTaskWithApi } from '@/lib/kanbanThunks';
+import { setSelectedTask } from '@/lib/kanbanSlice';
  
 interface TaskItemProps {
   task: Task;
@@ -69,6 +70,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
   return (
     <div
       ref={setNodeRef}
+      onClick={()=>dispatch(setSelectedTask({task}))}
       style={style}
       {...attributes}
       {...listeners}

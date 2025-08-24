@@ -10,7 +10,34 @@ import {
   Container,
   CreateTaskResponse
 } from '@/types';
- 
+
+export interface BulkSortUpdateRequest {
+  updates: {
+    taskId: string;
+    sortIndex: number;
+    containerId?: string;
+  }[];
+}
+
+export interface BulkSortUpdateResponse {
+  message: string;
+  modifiedCount: number;
+  tasks: ITask[];
+}
+
+export interface ReorderTasksRequest {
+  taskOrders: {
+    taskId: string;
+    sortIndex: number;
+  }[];
+}
+
+export interface ReorderTasksResponse {
+  message: string;
+  modifiedCount: number;
+  containerId: string;
+}
+
 // Plain fetchBaseQuery
 const baseQuery = fetchBaseQuery({
   baseUrl: process.env.NEXT_PUBLIC_BACKEND_URL, // All task APIs hit backend
@@ -158,6 +185,44 @@ export const taskApi = createApi({
         })),
       }),
     }),
+
+       bulkUpdateSortIndex: builder.mutation<BulkSortUpdateResponse, BulkSortUpdateRequest>({
+      query: (payload) => ({
+        url: '/tasks/bulk-sort-update',
+        method: 'PATCH',
+        body: payload,
+      }),
+      invalidatesTags: [{ type: 'TasksBoard' }],
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const result = await queryFulfilled;
+          console.log(`✅ Bulk updated ${result.data.modifiedCount} tasks`);
+        } catch (error) {
+          console.error('❌ Bulk sort update failed:', error);
+        }
+      },
+    }),
+
+    // NEW: Reorder tasks within a container (for simple same-container moves)
+    reorderTasksInContainer: builder.mutation<
+      ReorderTasksResponse, 
+      { containerId: string; taskOrders: ReorderTasksRequest['taskOrders'] }
+    >({
+      query: ({ containerId, taskOrders }) => ({
+        url: `/tasks/container/${containerId}/reorder`,
+        method: 'PATCH',
+        body: { taskOrders },
+      }),
+      invalidatesTags: [{ type: 'TasksBoard' }],
+      async onQueryStarted({ containerId, taskOrders }, { dispatch, queryFulfilled }) {
+        try {
+          const result = await queryFulfilled;
+          console.log(`✅ Reordered ${result.data.modifiedCount} tasks in container ${containerId}`);
+        } catch (error) {
+          console.error('❌ Container reorder failed:', error);
+        }
+      },
+    }),
   }),
 });
 
@@ -169,5 +234,7 @@ export const {
   useDeleteTaskMutation,
   useUpdateTaskStatusMutation,
   useGetTasksBoardQuery,
-  useCreateContainerMutation
+  useCreateContainerMutation,
+  useReorderTasksInContainerMutation,
+  useBulkUpdateSortIndexMutation
 } = taskApi;
