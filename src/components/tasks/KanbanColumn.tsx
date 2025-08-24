@@ -8,6 +8,9 @@ import TaskItem from './TaskItem';
 import { Container, ITask as Task } from '@/types';
 import { useAppDispatch } from '@/hooks/redux';
 import { updateContainerTitleWithApi } from '@/lib/kanbanThunks';
+import Popover from '../ui/Popover';
+import { useDeleteContainerMutation } from '@/lib/api/taskApi';
+import { deleteContainer } from '@/lib/kanbanSlice';
  
 interface KanbanColumnProps {
   container: Container;
@@ -34,7 +37,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
+const [deleteContainerApi,{}]=useDeleteContainerMutation()
   const handleTitleEdit = () => {
     const newTitle = prompt('Edit column title:', container.title);
     if (newTitle && newTitle !== container.title) {
@@ -44,6 +47,11 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
       }));
     }
   };
+
+  const handleDeleteContainer=()=>{
+// deleteContainerApi( container.id)
+deleteContainer(container.id)
+  }
 
   return (
     <div
@@ -79,7 +87,17 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({
             <Plus className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
           <button className="p-1.5 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors">
+            <Popover content={  <div id="dropdown" className="z-10   bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
+    <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+      <li>
+        <div  onClick={handleDeleteContainer} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</div>
+      </li>
+       
+     
+    </ul>
+</div>}>
             <MoreHorizontal className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+            </Popover>
           </button>
         </div>
       </div>

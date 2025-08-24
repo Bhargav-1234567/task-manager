@@ -1,14 +1,15 @@
 "use client"
 import { useState } from "react"
-import { useLoginMutation } from "@/lib/api/authApi"
+import { useLoginMutation, useRegisterMutation } from "@/lib/api/authApi"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("john@example.com")
-  const [password, setPassword] = useState("password123")
+export default function RegisterPage() {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [name,setName]=useState("")
   const [error, setError] = useState("")
-  const [login, { isLoading }] = useLoginMutation()
+  const [register, { isLoading }] = useRegisterMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = searchParams.get("from") || "/app"
@@ -18,7 +19,7 @@ export default function LoginPage() {
     setError("")
     
     try {
-      const result = await login({ email, password }).unwrap()
+      const result = await register({name, email, password }).unwrap()
        if (result.ok) {
          localStorage.setItem('token',result?.user?.token||"")
          localStorage.setItem('userData',JSON.stringify( result?.user  ))
@@ -35,7 +36,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
       <form onSubmit={handleLogin} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6 rounded-lg w-80 space-y-4 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white text-center">
-          Login
+          Register
         </h1>
         
         {error && (
@@ -43,14 +44,26 @@ export default function LoginPage() {
             {error}
           </div>
         )}
-        
+        <div className="space-y-2">
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Name
+          </label>
+          <input
+            id="name"
+            type="name"
+            className="w-full border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
         <div className="space-y-2">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Email
           </label>
           <input
             id="email"
-            pattern=" /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/"
             type="email"
             className="w-full border border-gray-300 dark:border-gray-600 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             placeholder="Enter your email"
@@ -80,10 +93,11 @@ export default function LoginPage() {
           disabled={isLoading}
           className="w-full bg-blue-600 dark:bg-blue-700 text-white py-2 px-4 rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? "Logging in..." : "Login"}
+          {isLoading ? "Register..." : "Register"}
         </button>
-        
-      <Link href="/register" className="block mt-2 text-sm text-blue-600 dark:text-blue-500 hover:underline">Go to Register</Link>
+        <Link href="/login" className="block mt-2 text-sm text-blue-600 dark:text-blue-500 hover:underline">Go to login</Link>
+
+       
       </form>
     </main>
   )

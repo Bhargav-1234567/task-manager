@@ -63,7 +63,7 @@ const TasksHeader = () => {
                   key={view.id}
                   onClick={() => setActiveView(view.id)}
                   className={`
-                    flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-150
+                    flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm font-medium 
                     ${activeView === view.id 
                       ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100' 
                       : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800'
@@ -93,10 +93,10 @@ const TasksHeader = () => {
                 type="text"
                 placeholder="Search in view..."
                 className="
-                  w-64 pl-10 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+                  w-64 pl-10 pr-4 py-2 text-sm  bg-white dark:bg-gray-800  border border-gray-200 dark:border-gray-700 
                   rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
                   text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400
-                  transition-colors duration-200
+                  
                 "
               />
             </div>

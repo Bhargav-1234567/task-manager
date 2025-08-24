@@ -103,7 +103,7 @@ const kanbanSlice = createSlice({
     updateTask: (state, action: PayloadAction<{ 
       containerId: string; 
       taskId: string; 
-      updates: Partial<Task> 
+      updates: Partial<ITask> 
     }>) => {
       const container = state.containers.find(c => c.id === action.payload.containerId);
       if (container) {

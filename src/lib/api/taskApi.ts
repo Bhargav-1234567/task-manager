@@ -161,6 +161,17 @@ export const taskApi = createApi({
       ],
     }),
 
+       deleteContainer: builder.mutation<any,string>({
+      query: (id) => ({
+        url: `/sections/${id}`,
+        method: 'Delete',
+       }),
+      invalidatesTags: (result, error) => [
+        
+        { type: 'TasksBoard' },
+      ],
+    }),
+
     getTasksBoard: builder.query<TasksBoardResponse, void>({
       query: () => `/tasks/board`,
       providesTags: ['TasksBoard'],
@@ -236,5 +247,6 @@ export const {
   useGetTasksBoardQuery,
   useCreateContainerMutation,
   useReorderTasksInContainerMutation,
-  useBulkUpdateSortIndexMutation
+  useBulkUpdateSortIndexMutation,
+  useDeleteContainerMutation
 } = taskApi;

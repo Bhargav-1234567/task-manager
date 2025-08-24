@@ -6,7 +6,10 @@ import { Calendar, Users, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp,
 import { ITask as Task } from '@/types';
 import { useAppDispatch } from '@/hooks/redux';
 import { updateTaskWithApi } from '@/lib/kanbanThunks';
-import { setSelectedTask } from '@/lib/kanbanSlice';
+import { deleteTask, setSelectedTask } from '@/lib/kanbanSlice';
+import dayjs from 'dayjs';
+import Popover from '../ui/Popover';
+import { useDeleteTaskMutation } from '@/lib/api/taskApi';
  
 interface TaskItemProps {
   task: Task;
@@ -19,7 +22,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task?.title || '');
   const [editDescription, setEditDescription] = useState(task?.description || '');
-  
+  const [deleteTaskApi,{}]=useDeleteTaskMutation()
   const {
     attributes,
     listeners,
@@ -33,6 +36,17 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+ 
+  const handleDeleteTask=()=>{
+ deleteTaskApi(task.id)
+dispatch(deleteTask({containerId:task.containerId||"",taskId:task.id||""}))
+  }
+
+  const handleEditTask=()=>{
+    dispatch(setSelectedTask({task}))
+  }
+
+  
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -54,14 +68,12 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
         description: editDescription,
       }
     }));
-    setIsEditing(false);
-  };
+   };
 
   const handleCancelEdit = () => {
     setEditTitle(task?.title || '');
     setEditDescription(task?.description || '');
-    setIsEditing(false);
-  };
+   };
 
   if (!task) {
     return null; // Or a loading/placeholder component
@@ -101,8 +113,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
         )}
         <div className="flex items-center gap-1">
           <button 
-            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-            onClick={() => setIsExpanded(!isExpanded)}
+            className="  p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            onClick={(e) =>{e.stopPropagation(); setIsExpanded(!isExpanded)}}
           >
             {isExpanded ? (
               <ChevronUp className="w-4 h-4 text-gray-400" />
@@ -110,14 +122,21 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
               <ChevronDown className="w-4 h-4 text-gray-400" />
             )}
           </button>
-          <button 
-            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            <Edit3 className="w-4 h-4 text-gray-400" />
-          </button>
-          <button className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          
+          <button className=" group-hover:opacity-100 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+            <Popover  content={  <div id="dropdown" className="z-10   bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
+    <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+      <li>
+        <div  onClick={handleDeleteTask} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Delete</div>
+      </li>
+      <li>
+        <div onClick={handleEditTask} className="cursor-pointer block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</div>
+      </li>
+     
+    </ul>
+</div>} >
             <MoreHorizontal className="w-4 h-4 text-gray-400" />
+            </Popover>
           </button>
         </div>
       </div>
@@ -140,30 +159,15 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
         </div>
       )}
 
-      {/* Edit Actions */}
-      {isEditing && (
-        <div className="flex gap-2 mb-3">
-          <button 
-            onClick={handleSaveEdit}
-            className="px-2 py-1 text-xs bg-blue-500 text-white rounded"
-          >
-            Save
-          </button>
-          <button 
-            onClick={handleCancelEdit}
-            className="px-2 py-1 text-xs bg-gray-500 text-white rounded"
-          >
-            Cancel
-          </button>
-        </div>
-      )}
+     
 
       {/* Date Range and Priority */}
       {task?.dueDate && (
         <div className="flex items-center gap-2 mb-3">
           <Calendar className="w-3 h-3 text-gray-400" />
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {task?.dueDate}
+            {task?.dueDate ?dayjs(task?.dueDate).format('DD-MM-YYYY'): "-" 
+ }
           </span>
           {task?.priority && (
             <span className={`text-xs px-2 py-1 rounded-full border ${getPriorityColor(task.priority)}`}>
@@ -186,7 +190,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
               {assignee?.name?.charAt(0) || '?'}
             </div>
           ))}
-          {task?.assignees?.length && task?.assignees?.length > 3 && (
+          {task?.assignees&& task?.assignees?.length>0&& task?.assignees?.length > 3 && (
             <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-300 border-2 border-white dark:border-gray-800">
               +{task?.assignees?.length - 3}
             </div>
