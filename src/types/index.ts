@@ -10,6 +10,50 @@ export interface Assignee {
   email?:string
 }
 
+// Add these interfaces to your existing types
+export interface TimeTrackingSession {
+  _id?: string;
+  startTime: string;
+  endTime?: string;
+  duration: number;
+  isActive: boolean;
+}
+
+export interface StartTimeTrackingResponse {
+  message: string;
+  task: ITask;
+  activeSession: TimeTrackingSession;
+}
+
+export interface StopTimeTrackingResponse {
+  message: string;
+  task: ITask;
+  sessionDuration: number;
+  totalTimeTracked: number;
+}
+
+export interface TimeTrackingStatusResponse {
+  isActive: boolean;
+  activeSession: {
+    startTime: string;
+    currentDuration: number;
+  } | null;
+  totalTimeTracked: number;
+  allSessions: TimeTrackingSession[];
+}
+
+export interface FormattedTimeTrackingSession extends TimeTrackingSession {
+  formattedDuration: string;
+  formattedStartTime: string;
+  formattedEndTime: string | null;
+}
+
+export interface TimeTrackingHistoryResponse {
+  history: FormattedTimeTrackingSession[];
+  totalTimeTracked: number;
+  formattedTotalTime: string;
+}
+
 export interface ITask {
   _id?:string,
   id: string;
@@ -24,7 +68,9 @@ export interface ITask {
   comments?: number;
   status?: string; // This will match the container title
   createdBy?:Assignee,
-   sortIndex:number
+   sortIndex:number,
+   timeTracked: number;
+  timeTracking?: TimeTrackingSession[];
 }
 
 export interface Container {
@@ -33,7 +79,12 @@ export interface Container {
   tasks: ITask[];
   color: string;
 }
-
+export interface ActiveTimeTracking {
+  taskId: string;
+  currentDuration: number;
+  startTime?: string; // Optional: if you want to track the actual start time
+  taskTitle?: string; // Optional: for display purposes
+}
 
 export interface CreateTaskRequest {
   title: string;

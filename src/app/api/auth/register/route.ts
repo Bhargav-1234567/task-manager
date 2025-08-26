@@ -4,7 +4,16 @@ import { setAuthCookie } from "@/lib/auth/cookies"
 
 export async function POST(req: Request) {
   const { name,email, password } = await req.json()
-
+function getRandomColor() {
+  const letters = "0123456789ABCDEF";
+  let color = "#";
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+const avatar = getRandomColor();
+console.log(avatar)
   try {
     // Call your Node.js API
     const response = await fetch(`${process.env.API_BASE_URL}/auth/register`, {
@@ -12,10 +21,9 @@ export async function POST(req: Request) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name,email, password }),
+      body: JSON.stringify({ name,email, password,avatar }),
     })
-    console.log({response})
-    if (!(response.status===200 ||response.status===201)  ) {
+     if (!(response.status===200 ||response.status===201)  ) {
       const error = await response.json()
       console.error("Login error:", error);
       return NextResponse.json(

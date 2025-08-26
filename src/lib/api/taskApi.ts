@@ -9,7 +9,11 @@ import {
   TasksBoardResponse,
   Container,
   CreateTaskResponse,
-  Assignee
+  Assignee,
+  StartTimeTrackingResponse,
+  StopTimeTrackingResponse,
+  TimeTrackingStatusResponse,
+  TimeTrackingHistoryResponse
 } from '@/types';
 
 export interface BulkSortUpdateRequest {
@@ -240,6 +244,44 @@ export const taskApi = createApi({
         }
       },
     }),
+
+     startTimeTracking: builder.mutation<StartTimeTrackingResponse, string>({
+      query: (taskId) => ({
+        url: `/tasks/${taskId}/time/start`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, taskId) => [
+        { type: 'Task', id: taskId },
+        { type: 'TimeTracking', id: taskId },
+        { type: 'TasksBoard' },
+      ],
+    }),
+
+    stopTimeTracking: builder.mutation<StopTimeTrackingResponse, string>({
+      query: (taskId) => ({
+        url: `/tasks/${taskId}/time/stop`,
+        method: 'POST',
+      }),
+      invalidatesTags: (result, error, taskId) => [
+        { type: 'Task', id: taskId },
+        { type: 'TimeTracking', id: taskId },
+        { type: 'TasksBoard' },
+      ],
+    }),
+
+    getTimeTrackingStatus: builder.query<TimeTrackingStatusResponse, string>({
+      query: (taskId) => `/tasks/${taskId}/time/status`,
+      providesTags: (result, error, taskId) => [
+        { type: 'TimeTracking', id: taskId },
+      ],
+    }),
+
+    getTimeTrackingHistory: builder.query<TimeTrackingHistoryResponse, string>({
+      query: (taskId) => `/tasks/${taskId}/time/history`,
+      providesTags: (result, error, taskId) => [
+        { type: 'TimeTracking', id: taskId },
+      ],
+    }),
   }),
 });
 
@@ -255,5 +297,9 @@ export const {
   useReorderTasksInContainerMutation,
   useBulkUpdateSortIndexMutation,
   useDeleteContainerMutation,
-  useGetUsersListQuery
+  useGetUsersListQuery,
+  useStartTimeTrackingMutation,
+  useStopTimeTrackingMutation,
+  useGetTimeTrackingStatusQuery,
+  useGetTimeTrackingHistoryQuery,
 } = taskApi;

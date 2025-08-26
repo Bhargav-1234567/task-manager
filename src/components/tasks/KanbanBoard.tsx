@@ -264,8 +264,7 @@ console.log({selectedTask})
   return (
     <div className="h-[calc(100vh-120px)] transition-colors duration-300">
       {/* Kanban Board */}
-      <TasksHeader/>
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
@@ -336,8 +335,7 @@ console.log({selectedTask})
       <Modal isOpen={Boolean(selectedTask)} onClose={()=>dispatch(setSelectedTask({task:null}))}>
          <TaskForm initialData={selectedTask} submitCall={()=>dispatch(setSelectedTask({task:null}))}/>
       </Modal>
-         {/* <TaskListView data={containers}/> */}
-
+ 
     </div>
   );
 };

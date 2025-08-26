@@ -9,9 +9,13 @@ https://task-manager-next-zen.netlify.app
 https://task-manager-backend-04g0.onrender.com/
 
 
-
 development instrunctions
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+testing env variables
+API_BASE_URL=http://localhost:5000/api
+JWT_SECRET=FlJNHQ2FnuG+4DqdYi0vbdNVrf6XSGZqccUClx/bKmk=
+NEXT_PUBLIC_BACKEND_URL=http://localhost:5000/api
 
 ## Getting Started
 

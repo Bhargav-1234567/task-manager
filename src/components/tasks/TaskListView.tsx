@@ -1,357 +1,281 @@
+'use client'
 import React, { useState, useEffect } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCorners,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable,
+  arrayMove,
+} from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import { Container } from '@/types';
-
+import { Play, Pause, Clock, Calendar, User, Paperclip, GripVertical, Sun, Moon } from 'lucide-react';
+import { ITask as Task,TimeTrackingSession } from '@/types';
+import TimeTrackingComponent from './TimeTrackingComponent';
+import SortableTaskItem from './SortableTaskItem';
 dayjs.extend(duration);
 
-// Types
-interface Assignee {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-}
-
-interface Task {
-  containerId: string;
-  id: string;
-  title: string;
-  status: string;
-  description: string;
-  dateRange: string;
-  priority: string;
-  assignees: Assignee[];
-  sortIndex: number;
-  dueDate: string | null;
-  timeTracked: number;
-  attachments: number;
-  comments: number;
-  likes: number;
-  createdAt: string;
-}
+// Types (unchanged)
+ 
 
  
-interface TaskListProps {
-  data: Container[];
+
+
+ 
+interface ActiveTimeTracking {
+  taskId: string;
+  startTime: string;
+  currentDuration: number;
 }
 
-interface TaskRowProps {
-  task: Task;
-  onStartTimer: (taskId: string) => void;
-  onStopTimer: (taskId: string) => void;
-  activeTimer: string | null;
-  elapsedTime: number;
-}
-
-interface TimerState {
-  taskId: string | null;
-  startTime: number | null;
-  elapsed: number;
-}
-
-// TaskRow Component
-const TaskRow: React.FC<TaskRowProps> = ({ 
-  task, 
-  onStartTimer, 
-  onStopTimer, 
-  activeTimer, 
-  elapsedTime 
-}) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: task.id });
-  
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const isActive = activeTimer === task.id;
-  const displayTime = isActive ? elapsedTime : task.timeTracked;
-  
-  const formatTime = (milliseconds: number) => {
-    const duration = dayjs.duration(milliseconds);
-    const hours = Math.floor(duration.asHours());
-    const minutes = duration.minutes();
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  };
-
-  const priorityColors = {
-    High: 'bg-red-500 dark:bg-red-700',
-    Normal: 'bg-blue-500 dark:bg-blue-700',
-    Low: 'bg-green-500 dark:bg-green-700',
-  };
-
-  return (
-    <tr
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-move"
-    >
-      <td className="py-3 px-4">
-        <div className="flex items-center">
-          <span className={`w-3 h-3 rounded-full ${priorityColors[task.priority as keyof typeof priorityColors]}`}></span>
-          <span className="ml-2 font-medium text-gray-800 dark:text-gray-200">{task.title}</span>
-        </div>
-      </td>
-      <td className="py-3 px-4">
-        <span className="text-sm text-gray-600 dark:text-gray-300">
-          {task.description}
-        </span>
-      </td>
-      <td className="py-3 px-4">
-        <span className="text-sm text-gray-600 dark:text-gray-300">
-          {task.status}
-        </span>
-      </td>
-      <td className="py-3 px-4">
-        <span className={`text-sm ${task.dateRange.includes('Overdue') ? 'text-red-500 dark:text-red-400' : 'text-gray-600 dark:text-gray-300'}`}>
-          {task.dateRange}
-        </span>
-      </td>
-      <td className="py-3 px-4">
-        <div className="flex -space-x-2">
-          {task.assignees.map((assignee) => (
-            <div
-              key={assignee.id}
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs text-white ${assignee.avatar}`}
-              title={assignee.name}
-            >
-              {assignee.name.charAt(0)}
-            </div>
-          ))}
-        </div>
-      </td>
-      <td className="py-3 px-4">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            isActive ? onStopTimer(task.id) : onStartTimer(task.id);
-          }}
-          className={`px-3 py-1 rounded-md text-sm font-medium ${
-            isActive
-              ? 'bg-red-500 text-white'
-              : 'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-          }`}
-        >
-          {isActive ? 'Stop' : 'Start'} {formatTime(displayTime)}
-        </button>
-      </td>
-      <td className="py-3 px-4">
-        <div className="flex items-center space-x-2">
-          {task.attachments > 0 && (
-            <span className="text-gray-500 dark:text-gray-400" title="Attachments">
-              📎 {task.attachments}
-            </span>
-          )}
-          {task.comments > 0 && (
-            <span className="text-gray-500 dark:text-gray-400" title="Comments">
-              💬 {task.comments}
-            </span>
-          )}
-          {task.likes > 0 && (
-            <span className="text-gray-500 dark:text-gray-400" title="Likes">
-              👍 {task.likes}
-            </span>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
+// Mock API functions (unchanged)
+const api = {
+  startTimeTracking: async (taskId: string) => {
+    console.log(`Starting time tracking for task ${taskId}`);
+  },
+  stopTimeTracking: async (taskId: string) => {
+    console.log(`Stopping time tracking for task ${taskId}`);
+  },
+  bulkUpdateSortIndex: async (updates: any[]) => {
+    console.log('Bulk updating sort indices:', updates);
+  },
 };
 
-// Main Component
-const TaskListTableView: React.FC<TaskListProps> = ({ data }) => {
-   const [containers, setContainers] = useState<Container[]>(data);
-  const [activeTimer, setActiveTimer] = useState<TimerState>({
-    taskId: null,
-    startTime: null,
-    elapsed: 0,
-  });
-  const [elapsedTime, setElapsedTime] = useState<number>(0);
-  const [isDark, setIsDark] = useState(false);
-useEffect(()=>{
-    if(data.length>0){
-        setContainers(data)
-    }
-},[data])
+// Sortable Task Item Component for List View
+ 
+
+// Main Task List Component
+const TaskListView: React.FC = ({apiTasks}) => {
+ 
+
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeTracking, setActiveTracking] = useState<ActiveTimeTracking | null>(null);
+ const [tasks,setTasks]=useState([])
   const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
     })
   );
 
-  // Update elapsed time for active timer
+  useEffect(()=>{
+if(apiTasks.length>0){
+  setTasks(apiTasks)
+}
+  },[apiTasks])
+  // Timer effect to update active tracking duration
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (activeTimer.taskId && activeTimer.startTime) {
+    if (activeTracking) {
       interval = setInterval(() => {
-        setElapsedTime(Date.now() - activeTimer.startTime! + activeTimer.elapsed);
+        setActiveTracking(prev => {
+          if (prev) {
+            const currentDuration = dayjs().diff(dayjs(prev.startTime), 'second');
+            return { ...prev, currentDuration };
+          }
+          return null;
+        });
       }, 1000);
     }
-    
+
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [activeTimer]);
+  }, [activeTracking]);
 
-  // Handle drag end for tasks
-  const handleDragEnd = (event: any) => {
+  // In your parent component
+ 
+// Function to update timer state
+const handleTimerUpdate = (taskId: string | null, duration?: number) => {
+  if (taskId) {
+    setActiveTracking({ taskId, currentDuration: duration || 0 });
+  } else {
+    setActiveTracking(null);
+  }
+};
+
+// Real-time timer update effect
+useEffect(() => {
+  let interval: NodeJS.Timeout;
+  
+  if (activeTracking) {
+    interval = setInterval(() => {
+      setActiveTracking(prev => {
+        if (!prev) return null;
+        return { ...prev, currentDuration: prev.currentDuration + 1 };
+      });
+    }, 1000);
+  }
+  
+  return () => {
+    if (interval) clearInterval(interval);
+  };
+}, [activeTracking]);
+
+// Check for any active timers on component mount
+useEffect(() => {
+  const checkActiveTimers = async () => {
+    try {
+      // You might want to implement an endpoint that checks for any active timers
+      // across all tasks for the current user, or iterate through tasks and check each one
+    } catch (error) {
+      console.error('Failed to check active timers:', error);
+    }
+  };
+  
+  checkActiveTimers();
+}, []);
+
+ 
+
+  const handleStartTimer = async (taskId: string) => {
+    try {
+      // Stop any existing timer first
+      if (activeTracking) {
+        await handleStopTimer(activeTracking.taskId);
+      }
+
+      await api.startTimeTracking(taskId);
+      setActiveTracking({
+        taskId,
+        startTime: dayjs().toISOString(),
+        currentDuration: 0
+      });
+    } catch (error) {
+      console.error('Failed to start timer:', error);
+    }
+  };
+
+  const handleStopTimer = async (taskId: string) => {
+    try {
+      await api.stopTimeTracking(taskId);
+      
+      // Update the task's total time tracked
+      setTasks(prev => prev.map(task => 
+        task.id === taskId 
+          ? { ...task, timeTracked: task.timeTracked + (activeTracking?.currentDuration || 0) }
+          : task
+      ));
+
+      setActiveTracking(null);
+    } catch (error) {
+      console.error('Failed to stop timer:', error);
+    }
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+    setActiveId(null);
+
     if (!over) return;
-    
-    if (active.id !== over.id) {
-      setContainers((prevContainers) => {
-        const allTasks = prevContainers.flatMap(container => container.tasks);
-        const activeIndex = allTasks.findIndex(task => task.id === active.id);
-        const overIndex = allTasks.findIndex(task => task.id === over.id);
-        
-        if (activeIndex === -1 || overIndex === -1) return prevContainers;
-        
-        const newTasks = arrayMove(allTasks, activeIndex, overIndex);
-        
-        // Reconstruct containers with reordered tasks
-        return prevContainers.map(container => ({
-          ...container,
-          tasks: newTasks.filter(task => task.containerId === container.id)
-        }));
-      });
-    }
-  };
 
-  // Start timer for a task
-  const handleStartTimer = (taskId: string) => {
-    // If there's already an active timer, stop it first
-    if (activeTimer.taskId) {
-      handleStopTimer(activeTimer.taskId);
-    }
-    
-    setActiveTimer({
-      taskId,
-      startTime: Date.now(),
-      elapsed: 0,
-    });
-    setElapsedTime(0);
-  };
+    const activeId = active.id as string;
+    const overId = over.id as string;
 
-  // Stop timer for a task and update timeTracked
-  const handleStopTimer = (taskId: string) => {
-    if (activeTimer.taskId === taskId && activeTimer.startTime) {
-      const timeToAdd = Date.now() - activeTimer.startTime + activeTimer.elapsed;
+    // Find the active task
+    const activeTask = tasks.find(task => task.id === activeId);
+    if (!activeTask) return;
+
+    // Get the current task indices
+    const activeIndex = tasks.findIndex(task => task.id === activeId);
+    const overIndex = tasks.findIndex(task => task.id === overId);
+
+    if (activeIndex !== overIndex) {
+      // Reorder the tasks
+      const newTasks = arrayMove(tasks, activeIndex, overIndex);
       
-      setContainers(prev => 
-        prev.map(container => ({
-          ...container,
-          tasks: container.tasks.map(task => 
-            task.id === taskId 
-              ? { ...task, timeTracked: task.timeTracked + timeToAdd }
-              : task
-          )
-        }))
-      );
+      // Update sort indices
+      const updatedTasks = newTasks.map((task, index) => ({
+        ...task,
+        sortIndex: index
+      }));
       
-      setActiveTimer({
-        taskId: null,
-        startTime: null,
-        elapsed: 0,
-      });
+      setTasks(updatedTasks);
+
+      // Prepare API update
+      const updates = updatedTasks.map((task, index) => ({
+        taskId: task.id,
+        sortIndex: index
+      }));
+
+      try {
+        await api.bulkUpdateSortIndex(updates);
+      } catch (error) {
+        console.error('Failed to update sort order:', error);
+        // Revert changes on error
+        setTasks(tasks);
+      }
     }
   };
 
-  // Toggle dark/light theme
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-    if (!isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
+  const activeTask = activeId ? tasks.find(task => task.id === activeId) : null;
 
-  // Get all tasks from all containers
-  const allTasks = containers.flatMap(container => container.tasks);
-console.log({allTasks,containers})
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-200">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Task List</h1>
-          <button
-            onClick={toggleTheme}
-            className="px-4 py-2 rounded-md bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-white"
-          >
-            {isDark ? 'Light Mode' : 'Dark Mode'}
-          </button>
-        </div>
-        
-        {activeTimer.taskId && (
-          <div className="p-4 mb-6 rounded-lg bg-blue-50 dark:bg-blue-900/30 shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white">Active Timer</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Task: {allTasks.find(t => t.id === activeTimer.taskId)?.title}
-                </p>
-              </div>
-              <div className="text-2xl font-mono text-gray-800 dark:text-white">
-                {dayjs.duration(elapsedTime).format('HH:mm:ss')}
-              </div>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+      <div className="w-full">
+
+        {activeTracking && (
+          <div className="mb-6 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800/50 rounded-lg p-3">
+            <div className="flex items-center text-green-800 dark:text-green-300">
+              <Clock className="w-4 h-4 mr-2" />
+              <span className="font-medium">Timer Active:</span>
+              <span className="ml-2 font-mono">
+                {dayjs.duration(activeTracking.currentDuration, 'seconds').format('HH:mm:ss')}
+              </span>
             </div>
           </div>
         )}
-        
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-700 text-left text-gray-600 dark:text-gray-300 text-sm uppercase tracking-wider">
-                  <th className="py-3 px-4 font-medium">Title</th>
-                  <th className="py-3 px-4 font-medium">Description</th>
-                  <th className="py-3 px-4 font-medium">Status</th>
-                  <th className="py-3 px-4 font-medium">Due Date</th>
-                  <th className="py-3 px-4 font-medium">Assignees</th>
-                  <th className="py-3 px-4 font-medium">Timer</th>
-                  <th className="py-3 px-4 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <SortableContext items={allTasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                  {allTasks.map((task) => (
-                    <TaskRow
-                      key={task.id}
-                      task={task}
-                      onStartTimer={handleStartTimer}
-                      onStopTimer={handleStopTimer}
-                      activeTimer={activeTimer.taskId}
-                      elapsedTime={elapsedTime}
-                    />
-                  ))}
-                </SortableContext>
-              </tbody>
-            </table>
-          </DndContext>
-          
-          {allTasks.length === 0 && (
-            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-              <p>No tasks available</p>
-            </div>
-          )}
-        </div>
+
+        {/* Task List */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm ">
+            <SortableContext items={tasks.map(task => task.id)} strategy={verticalListSortingStrategy}>
+              {tasks.map((task) => (
+                <SortableTaskItem
+                  key={task.id}
+                  task={task}
+                  activeTracking={activeTracking}
+                  onStartTimer={handleStartTimer}
+                  onStopTimer={handleStopTimer}
+                />
+              ))}
+            </SortableContext>
+          </div>
+
+          <DragOverlay>
+            {activeTask && (
+              <div className="bg-white bg-gray-800/50 rounded-lg shadow-lg border p-4 rotate-3 cursor-grabbing">
+                <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+                  {activeTask.title}
+                </h3>
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
       </div>
     </div>
   );
 };
 
-export default TaskListTableView;
+export default TaskListView;
