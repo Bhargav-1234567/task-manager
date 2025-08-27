@@ -7,7 +7,9 @@ interface KanbanState {
   isLoading: boolean;
   error: string | null;
   lastMovedTask: Task | null; 
-  selectedTask:Task|null
+  selectedTask:Task|null,
+  activeSessionData:any,
+  timerStarted:boolean
 }
 
 const initialState: KanbanState = {
@@ -15,7 +17,9 @@ const initialState: KanbanState = {
   isLoading: false,
   error: null,
   lastMovedTask: null,
-  selectedTask:null
+  selectedTask:null,
+  activeSessionData:null,
+  timerStarted:false
 };
 
 // Helper function to generate a sort index (can be based on timestamp or sequence)
@@ -90,6 +94,7 @@ const kanbanSlice = createSlice({
     // Task CRUD operations
     addTask: (state, action: PayloadAction<{ containerId: string; task: Task }>) => {
       const container = state.containers.find(c => c.id === action.payload.containerId);
+       
       if (container) {
         const newTask = {
           ...action.payload.task,
@@ -105,10 +110,13 @@ const kanbanSlice = createSlice({
       taskId: string; 
       updates: Partial<ITask> 
     }>) => {
-      console.log(action.payload.updates,'action.payload.updates')
-      const container = state.containers.find(c => c.id === action.payload.containerId);
+
+       const container = state.containers.find(c => c.id === action.payload.containerId);
+                console.log(container,action.payload.updates,'adfasdfasdf')
+
       if (container) {
         const task = container.tasks.find(t => t.id === action.payload.taskId);
+             
         if (task) {
           Object.assign(task, action.payload.updates);
         }
@@ -122,7 +130,7 @@ const kanbanSlice = createSlice({
         container.tasks = normalizeSortIndices(container.tasks);
       }
     },
-    
+     
     // Drag and drop operations
 resetLastMovedTask: (state) => {
   state.lastMovedTask = null;
@@ -152,12 +160,15 @@ setSelectedTask: (state, action: PayloadAction<{
  
 }>) => {
  
-    console.log(action.payload.task,'asdasdasdasd')
-    // Set the moved task with updated sortIndex
-    state.selectedTask =  action.payload.task;
+     state.selectedTask =  action.payload.task;
    
 },
-
+setActiveSessionData :(state,action)=>{
+  state.activeSessionData=action.payload
+},
+setTimerStarted :(state,action)=>{
+  state.timerStarted=action.payload
+},
 moveTaskBetweenContainers: (state, action: PayloadAction<{
   fromContainerId: string;
   toContainerId: string;
@@ -221,7 +232,9 @@ export const {
   moveTaskBetweenContainers,
   normalizeAllSortIndices,
   resetLastMovedTask,
-  setSelectedTask
+  setSelectedTask,
+  setActiveSessionData,
+  setTimerStarted
 } = kanbanSlice.actions;
 
 export default kanbanSlice.reducer;

@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Calendar, Users, MessageCircle, MoreHorizontal, ChevronDown, ChevronUp, Edit3, User } from 'lucide-react';
-import { ITask as Task } from '@/types';
-import { useAppDispatch } from '@/hooks/redux';
+import { ITask, ITask as Task } from '@/types';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { updateTaskWithApi } from '@/lib/kanbanThunks';
 import { deleteTask, setSelectedTask } from '@/lib/kanbanSlice';
 import dayjs from 'dayjs';
@@ -12,7 +12,7 @@ import Popover from '../ui/Popover';
 import { useDeleteTaskMutation } from '@/lib/api/taskApi';
  
 interface TaskItemProps {
-  task: Task;
+  task: ITask;
   containerId: string;
 }
 
@@ -22,6 +22,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, containerId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task?.title || '');
   const [editDescription, setEditDescription] = useState(task?.description || '');
+   
   const [deleteTaskApi,{}]=useDeleteTaskMutation()
   const {
     attributes,
@@ -43,7 +44,7 @@ dispatch(deleteTask({containerId:task.containerId||"",taskId:task.id||""}))
   }
 
   const handleEditTask=()=>{
-    dispatch(setSelectedTask({task}))
+    dispatch(setSelectedTask({task:{...task,containerId:containerId}}))
   }
 
   
@@ -82,7 +83,7 @@ dispatch(deleteTask({containerId:task.containerId||"",taskId:task.id||""}))
   return (
     <div
       ref={setNodeRef}
-      onClick={()=>dispatch(setSelectedTask({task}))}
+      onClick={()=>dispatch(setSelectedTask({task:{...task,containerId:containerId}}))}
       style={style}
       {...attributes}
       {...listeners}

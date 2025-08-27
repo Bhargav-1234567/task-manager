@@ -50,10 +50,9 @@ const TaskForm: React.FC<TaskFormProps> = ({
   const dispatch = useDispatch();
    const statusOptions = ['To Do', 'In Progress', 'Review', 'Done'];
   const labelOptions = ['Frontend', 'Backend', 'UI/UX', 'Bug', 'Feature'];
- 
+ console.log({initialData})
    const handleFormSubmit = (data: ITask) => {
-    console.log({data})
-    if (initialData?.id) {
+     if (initialData?.id) {
       updateTaskApi({ ...data }).then(()=>{
         submitCall&&submitCall()
       });

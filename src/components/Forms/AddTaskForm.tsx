@@ -27,8 +27,7 @@ const dispatch = useDispatch<AppDispatch>();
   const onSubmit = (data: FormValues) => {
    
     const container = containers.find(c => c.id === containerId);
-    console.log({container},'aaaaaaaaaaa')
-    const userData:Assignee = JSON.parse( localStorage.getItem('userData')||"")
+     const userData:Assignee = JSON.parse( localStorage.getItem('userData')||"")
     const newTask: CreateTaskRequest = {
        title: data.title,
       description: data.description||"",
@@ -40,8 +39,7 @@ const dispatch = useDispatch<AppDispatch>();
       sortIndex:(container.tasks.length||0) 
     };
     addCardApi(newTask).then(task=>{
-        console.log({task})
-           const newTask: ITask = {
+            const newTask: ITask = {
               id: task?.data?._id,
               title:  task?.data?.title,
               description: task?.data?.description,

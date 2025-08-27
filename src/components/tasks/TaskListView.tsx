@@ -23,6 +23,8 @@ import { Play, Pause, Clock, Calendar, User, Paperclip, GripVertical, Sun, Moon 
 import { ITask as Task,TimeTrackingSession } from '@/types';
 import TimeTrackingComponent from './TimeTrackingComponent';
 import SortableTaskItem from './SortableTaskItem';
+import { useGetActiveSessionMutation } from '@/lib/api/taskApi';
+import ActiveSession from './ActiveSession';
 dayjs.extend(duration);
 
 // Types (unchanged)
@@ -57,8 +59,7 @@ const api = {
 // Main Task List Component
 const TaskListView: React.FC = ({apiTasks}) => {
  
-
-  const [activeId, setActiveId] = useState<string | null>(null);
+   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeTracking, setActiveTracking] = useState<ActiveTimeTracking | null>(null);
  const [tasks,setTasks]=useState([])
   const sensors = useSensors(
@@ -241,7 +242,7 @@ useEffect(() => {
             </div>
           </div>
         )}
-
+<ActiveSession/>
         {/* Task List */}
         <DndContext
           sensors={sensors}

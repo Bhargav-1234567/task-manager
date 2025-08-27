@@ -80,7 +80,7 @@ const baseQueryWithAuth = async (args: any, api: any, extraOptions: any) => {
 export const taskApi = createApi({
   reducerPath: 'taskApi',
   baseQuery: baseQueryWithAuth,
-  tagTypes: ['Task', 'TasksBoard'],
+  tagTypes: ['Task', 'TasksBoard',"Timer"],
   endpoints: (builder) => ({
     // Get all tasks
     getTasks: builder.query<ITask[], TasksQueryParams | void>({
@@ -250,11 +250,7 @@ export const taskApi = createApi({
         url: `/tasks/${taskId}/time/start`,
         method: 'POST',
       }),
-      invalidatesTags: (result, error, taskId) => [
-        { type: 'Task', id: taskId },
-        { type: 'TimeTracking', id: taskId },
-        { type: 'TasksBoard' },
-      ],
+     invalidatesTags: ['Timer'],
     }),
 
     stopTimeTracking: builder.mutation<StopTimeTrackingResponse, string>({
@@ -262,25 +258,21 @@ export const taskApi = createApi({
         url: `/tasks/${taskId}/time/stop`,
         method: 'POST',
       }),
-      invalidatesTags: (result, error, taskId) => [
-        { type: 'Task', id: taskId },
-        { type: 'TimeTracking', id: taskId },
-        { type: 'TasksBoard' },
-      ],
+     invalidatesTags: ['Timer'],
     }),
 
     getTimeTrackingStatus: builder.query<TimeTrackingStatusResponse, string>({
       query: (taskId) => `/tasks/${taskId}/time/status`,
-      providesTags: (result, error, taskId) => [
-        { type: 'TimeTracking', id: taskId },
-      ],
+      providesTags:  [],
     }),
 
     getTimeTrackingHistory: builder.query<TimeTrackingHistoryResponse, string>({
       query: (taskId) => `/tasks/${taskId}/time/history`,
-      providesTags: (result, error, taskId) => [
-        { type: 'TimeTracking', id: taskId },
-      ],
+      providesTags: ['Timer'],
+    }),
+       getActiveSession: builder.query<TimeTrackingHistoryResponse, string>({
+      query: () => `/tasks/time-tracking/active-sessions`,
+      providesTags:  ['Timer'],
     }),
   }),
 });
@@ -302,4 +294,5 @@ export const {
   useStopTimeTrackingMutation,
   useGetTimeTrackingStatusQuery,
   useGetTimeTrackingHistoryQuery,
+  useGetActiveSessionQuery
 } = taskApi;
