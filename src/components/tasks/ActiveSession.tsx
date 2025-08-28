@@ -27,8 +27,9 @@ const ActiveSession: React.FC = () => {
  const [stopTimeTracking] = useStopTimeTrackingMutation();
    // fetch initial duration
   useEffect(() => {
-    if(sessionData){
-       const res: any = sessionData
+    if(sessionData?.count>0){
+      console.log({sessionData})
+        const res: any = sessionData
       if (res?.activeSessions?.[0]?.duration) {
         setTime(res?.activeSessions?.[0]?.duration) // start from duration;
         setSessionDetails(res?.activeSessions?.[0])
@@ -37,13 +38,17 @@ const ActiveSession: React.FC = () => {
         setIsRunning(false)
         dispatch(setTimerStarted(false))
        }
+    }else{
+      setTime(0) // start from duration;
+        setSessionDetails({taskId:"",taskTitle:""})
+        dispatch(setActiveSessionData(null))
     }
     
    }, [sessionData])
 
    useEffect(()=>{
     if(timerStarted){
-        refetch()
+        // refetch()
         setIsRunning(true)
     }
    },[timerStarted])
@@ -73,7 +78,7 @@ const ActiveSession: React.FC = () => {
     ).padStart(2, '0')}:${String(d.seconds()).padStart(2, '0')}`
   }
 
- if(!sessionDetails.taskId){
+ if(!sessionDetails.taskId ){
     return<></>
  }
 
