@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Calendar, Clock, Paperclip, Play, Pause } from 'lucide-react';
@@ -12,8 +12,9 @@ import {
   useGetActiveSessionQuery,
 } from '@/lib/api/taskApi';
 import { useAppSelector } from '@/hooks/redux';
-import { setActiveSessionData, setTimerStarted } from '@/lib/kanbanSlice';
+import { setActiveSessionData, setSelectedTask, setTimerStarted } from '@/lib/kanbanSlice';
 import { useDispatch } from 'react-redux';
+import { useToast } from '@/hooks/useToast';
 
 dayjs.extend(duration);
 
@@ -31,8 +32,10 @@ const SortableTaskItem: React.FC<{
     isDragging,
   } = useSortable({ id: task.id });
 const dispatch = useDispatch()
+  const toast = useToast();
+
   // Time tracking API hooks
-  const [startTimeTracking] = useStartTimeTrackingMutation();
+  const [startTimeTracking,{error:errorInTimer}] = useStartTimeTrackingMutation();
   const [stopTimeTracking] = useStopTimeTrackingMutation();
    const { activeSessionData,timerStarted } = useAppSelector(state => state.kanban);
  
@@ -75,7 +78,9 @@ const dispatch = useDispatch()
    const handleStartTimer = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      await startTimeTracking(task.id).unwrap();
+      await startTimeTracking(task.id).unwrap().then(data=>{
+        dispatch(setActiveSessionData(data.activeSession))
+      });
       dispatch(setTimerStarted(true))
       onTimerUpdate(task.id, 0);
      } catch (error) {
@@ -95,6 +100,11 @@ const dispatch = useDispatch()
     }
   };
 
+  useEffect(()=>{
+    if(errorInTimer){
+      toast.error(errorInTimer?.data?.message)
+    }
+  },[errorInTimer])
   // Update the active tracking duration if this task is being tracked
    
 
@@ -102,7 +112,8 @@ const dispatch = useDispatch()
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-4 p-4 mb-3 rounded-lg border dark:border-0  
+       onClick={()=>dispatch(setSelectedTask({task:{...task,containerId:task.containerId}}))}
+      className={`flex cursor-pointer items-center gap-4 p-4 mb-3 rounded-lg border dark:border-0  
         ${isDragging 
           ? 'shadow-lg bg-white/80 dark:bg-gray-800/80/50' 
           : 'bg-white dark:bg-gray-800/50 shadow-sm hover:shadow-md'
@@ -176,7 +187,7 @@ const dispatch = useDispatch()
           {task.assignees.slice(0, 3).map((user) => (
             <div
               key={user.id}
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-white ${user.avatar}`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium text-white  bg-purple-500 border border-white dark:border-white-200`}
               title={user.name}
             >
               {user.name.charAt(0).toUpperCase()}

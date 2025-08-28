@@ -5,12 +5,15 @@ import kanbanReducer from './kanbanSlice'
 import { authApi } from './api/authApi'
 import { userApi } from './api/userApi'
 import { taskApi } from './api/taskApi'
+import toastReducer from './toastSlice';
 
 export const store = configureStore({
   reducer: {
     ui: uiReducer,
     board: boardReducer,
     kanban: kanbanReducer,
+        toast: toastReducer,
+
     [authApi.reducerPath]: authApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
      [taskApi.reducerPath]: taskApi.reducer,

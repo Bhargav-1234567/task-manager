@@ -28,8 +28,7 @@ export async function getServerUser() {
     }
 
     const userData = await response.json()
-    
-    return {
+     return {
       id: userData._id,
       name: userData.name,
       email: userData.email,

@@ -32,7 +32,7 @@ import {
 import { fetchInitialData } from '@/lib/kanbanThunks';
 import Modal from '../ui/Modal';
 import AddContainerForm from '../Forms/AddContainerForm';
-import { useCreateContainerMutation, useGetTasksBoardQuery, useUpdateTaskMutation, useUpdateTaskStatusMutation } from '@/lib/api/taskApi';
+import { useCreateContainerMutation, useGetDashoardDataQuery, useGetTasksBoardQuery, useUpdateTaskMutation, useUpdateTaskStatusMutation } from '@/lib/api/taskApi';
 import AddTaskForm from '../Forms/AddTaskForm';
 import { useKanbanBackendSync } from '@/hooks/useKanbanBackendSync';
 import TasksHeader from './TasksHeader';
@@ -55,7 +55,8 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({containersFromApi}) => {
   const [overTaskId, setOverTaskId] = useState<string | null>(null);
   const movedTask = useAppSelector((state) => state.kanban.lastMovedTask);
   const { syncContainerToBackend, syncAllToBackend } = useKanbanBackendSync();
-
+const {data:dashBoardData}=useGetDashoardDataQuery();
+console.log({dashBoardData})
     const [addModelOpen,setAddModelOpen]=useState(false)
     const {
     data: boardData,
@@ -332,7 +333,7 @@ console.log({selectedTask})
         <AddTaskForm  containerId={selectedcontainer} containers={containers} submitCall={()=>setOpenaaddCardModel(false)} />
       </Modal>
 
-      <Modal isOpen={Boolean(selectedTask)} onClose={()=>dispatch(setSelectedTask({task:null}))}>
+      <Modal isOpen={Boolean(selectedTask)}  widthClass='w-xl' onClose={()=>dispatch(setSelectedTask({task:null}))}>
          <TaskForm initialData={selectedTask} submitCall={()=>dispatch(setSelectedTask({task:null}))}/>
       </Modal>
  

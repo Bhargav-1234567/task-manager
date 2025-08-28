@@ -25,6 +25,11 @@ import TimeTrackingComponent from './TimeTrackingComponent';
 import SortableTaskItem from './SortableTaskItem';
 import { useGetActiveSessionMutation } from '@/lib/api/taskApi';
 import ActiveSession from './ActiveSession';
+import { setSelectedTask } from '@/lib/kanbanSlice';
+import Modal from '../ui/Modal';
+import TaskForm from '../Forms/TaskForm';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '@/hooks/redux';
 dayjs.extend(duration);
 
 // Types (unchanged)
@@ -58,6 +63,8 @@ const api = {
 
 // Main Task List Component
 const TaskListView: React.FC = ({apiTasks}) => {
+ const dispatch = useDispatch();
+   const {   selectedTask } = useAppSelector(state => state.kanban);
  
    const [activeId, setActiveId] = useState<string | null>(null);
   const [activeTracking, setActiveTracking] = useState<ActiveTimeTracking | null>(null);
@@ -242,7 +249,6 @@ useEffect(() => {
             </div>
           </div>
         )}
-<ActiveSession/>
         {/* Task List */}
         <DndContext
           sensors={sensors}
@@ -275,6 +281,10 @@ useEffect(() => {
           </DragOverlay>
         </DndContext>
       </div>
+
+       <Modal isOpen={Boolean(selectedTask)}  widthClass='w-xl' onClose={()=>dispatch(setSelectedTask({task:null}))}>
+               <TaskForm initialData={selectedTask} submitCall={()=>dispatch(setSelectedTask({task:null}))}/>
+            </Modal>
     </div>
   );
 };

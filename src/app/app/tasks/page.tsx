@@ -5,6 +5,7 @@ import TasksHeader from '@/components/tasks/TasksHeader';
 import TaskListView from '@/components/tasks/TaskListView';
 import { Container } from '@/types';
 import { cookies } from 'next/headers';
+import ActiveSession from '@/components/tasks/ActiveSession';
 
 const API_BASE = process.env.API_BASE_URL;
 
@@ -39,6 +40,7 @@ const task = boardData?.reduce((acc,item)=>[...acc,...item.tasks],[]);
     return (
     <div>
       <TasksHeader />
+<ActiveSession/>
 
       {view === 'list' ? (
         <TaskListView apiTasks={task} />

@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [login, { isLoading }] = useLoginMutation()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get("from") || "/app"
+  const redirectTo =  "/app"
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()

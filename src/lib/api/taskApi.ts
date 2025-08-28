@@ -274,6 +274,11 @@ export const taskApi = createApi({
       query: () => `/tasks/time-tracking/active-sessions`,
       providesTags:  ['Timer'],
     }),
+
+     getDashoardData: builder.query<any, any>({
+      query: (taskId) => `/tasks/dashboard/user-stats`,
+     }),
+   
   }),
 });
 
@@ -294,5 +299,6 @@ export const {
   useStopTimeTrackingMutation,
   useGetTimeTrackingStatusQuery,
   useGetTimeTrackingHistoryQuery,
-  useGetActiveSessionQuery
+  useGetActiveSessionQuery,
+  useGetDashoardDataQuery
 } = taskApi;

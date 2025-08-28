@@ -4,8 +4,9 @@ import { redirect } from "next/navigation";
 
 export default async function Home() {
     const user = await getServerUser()
+    console.log({user})
    if (!user) {
-    redirect('/login?from=/dashboard')
+    redirect('/login?from=/app')
   }else{
      redirect('/app')
   }
