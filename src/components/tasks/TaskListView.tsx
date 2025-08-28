@@ -272,7 +272,7 @@ useEffect(() => {
 
           <DragOverlay>
             {activeTask && (
-              <div className="bg-white bg-gray-800/50 rounded-lg shadow-lg border p-4 rotate-3 cursor-grabbing">
+              <div className="bg-white dark:bg-gray-900 bg-gray-800/50 rounded-lg shadow-lg dark:border-0 border p-4 rotate-3 cursor-grabbing">
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
                   {activeTask.title}
                 </h3>
